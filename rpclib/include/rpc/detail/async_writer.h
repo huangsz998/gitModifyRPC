@@ -9,6 +9,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <type_traits>
 
 #include "asio.hpp"
 
@@ -18,7 +19,68 @@
 namespace rpc {
 namespace detail {
 
-//! \brief 改造为模板类以支持不同类型的socket
+// Forward declaration helper function
+template <typename SocketType>
+struct socket_traits {
+    static void close_socket(SocketType& socket, std::error_code& ec) {
+        // Default implementation: call both shutdown and close
+        socket.shutdown(RPCLIB_ASIO::socket_base::shutdown_both, ec);
+        socket.close(ec);
+    }
+};
+
+// Windows platform stream_handle specialization
+#ifdef _WIN32
+template <>
+struct socket_traits<RPCLIB_ASIO::windows::stream_handle> {
+    static void close_socket(RPCLIB_ASIO::windows::stream_handle& socket, std::error_code& ec) {
+        // Windows stream_handle has no shutdown method, just call close
+        socket.close(ec);
+    }
+};
+#endif
+
+// Helper function for writing to different socket types - FIXED WITH COMMON INTERFACE
+template <typename T>
+inline void write_helper(T &s, RPCLIB_MSGPACK::sbuffer &buf, bool /* message_mode */ = false) {
+    // Standard async_write for most socket types
+    RPCLIB_ASIO::async_write(
+        s, RPCLIB_ASIO::buffer(buf.data(), buf.size()),
+        [](std::error_code, std::size_t) {});
+}
+
+#ifdef _WIN32
+// Specialized write helper for Windows Named Pipes with message mode support and framing
+template <>
+inline void write_helper<RPCLIB_ASIO::windows::stream_handle>(
+    RPCLIB_ASIO::windows::stream_handle &s, 
+    RPCLIB_MSGPACK::sbuffer &buf, 
+    bool message_mode) {
+        
+    if (message_mode) {
+        // For message mode, add a 4-byte length prefix before the payload
+        uint32_t len = static_cast<uint32_t>(buf.size());
+        std::vector<char> framed;
+        framed.resize(4 + buf.size());
+        memcpy(framed.data(), &len, 4); // Little-endian
+        memcpy(framed.data() + 4, buf.data(), buf.size());
+        try {
+            RPCLIB_ASIO::write(
+                s, RPCLIB_ASIO::buffer(framed.data(), framed.size()));
+        }
+        catch (const std::exception&) {
+            // Handle write errors - log if needed
+        }
+    } else {
+        // Standard byte-oriented async write
+        RPCLIB_ASIO::async_write(
+            s, RPCLIB_ASIO::buffer(buf.data(), buf.size()),
+            [](std::error_code, std::size_t) {});
+    }
+}
+#endif
+
+//! \brief Template class to support different socket types
 template <typename SocketType>
 class async_writer : public std::enable_shared_from_this<async_writer<SocketType>> {
 public:
@@ -27,17 +89,31 @@ public:
           write_strand_(*io),
           is_writing_(false),
           exit_(false),
-          is_closed_(false) {}
+          is_closed_(false),
+          message_mode_(false) {} // Added message_mode_ flag initialization
 
     void write(RPCLIB_MSGPACK::sbuffer &&data);
     
     SocketType &socket();
+
+    // ADD: Expose the underlying socket/stream_handle for external read
+    SocketType &stream() { return socket_; }
     
     RPCLIB_ASIO::strand &write_strand();
     
     void close();
     
     bool is_closed() const;
+    
+    // Add setter for message mode
+    void set_message_mode(bool enabled) {
+        message_mode_ = enabled;
+    }
+    
+    // Add getter for message mode
+    bool get_message_mode() const {
+        return message_mode_;
+    }
 
 protected:
     template <typename T>
@@ -54,12 +130,13 @@ private:
     std::deque<RPCLIB_MSGPACK::sbuffer> write_queue_;
     std::atomic_bool exit_;
     std::atomic_bool is_closed_;
+    bool message_mode_; // Flag to indicate if using message mode
 };
 
-// 特化为原始类型，用于向后兼容
+// Specialized as original type for backward compatibility
 using async_writer_tcp = async_writer<RPCLIB_ASIO::ip::tcp::socket>;
 
-// 模板实现部分
+// Template implementation part
 template <typename SocketType>
 void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
     write_queue_.push_back(std::move(data));
@@ -71,6 +148,25 @@ void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
                 return;
             }
             auto &item = write_queue_.front();
+            
+#ifdef _WIN32
+            // Check if this is a Windows named pipe with message mode
+            if (std::is_same<SocketType, RPCLIB_ASIO::windows::stream_handle>::value && message_mode_) {
+                // Use specialized helper for Windows Named Pipes (framing included)
+                write_helper(socket_, item, message_mode_);
+                
+                // Handle completion directly for message mode
+                write_queue_.pop_front();
+                is_writing_ = false;
+                
+                // Process next item in queue if any
+                if (!write_queue_.empty() && !exit_) {
+                    write(std::move(RPCLIB_MSGPACK::sbuffer())); // Dummy to trigger processing
+                }
+                return;
+            }
+#endif
+            // Standard async write for non-Windows or non-message mode
             socket_.async_write_some(
                 RPCLIB_ASIO::buffer(item.data(), item.size()),
                 write_strand_.wrap(
@@ -89,7 +185,7 @@ void async_writer<SocketType>::write_handler(std::error_code ec, std::size_t tra
     
     if (!ec) {
         if (transferred < write_queue_.front().size()) {
-            // sbuffer没有consume方法，我们需要创建一个新的缓冲区
+            // sbuffer has no consume method, we need to create a new buffer
             RPCLIB_MSGPACK::sbuffer new_buf;
             const size_t remaining = write_queue_.front().size() - transferred;
             new_buf.write(write_queue_.front().data() + transferred, remaining);
@@ -149,8 +245,9 @@ void async_writer<SocketType>::close() {
     exit_ = true;
     is_closed_ = true;
     std::error_code ec;
-    socket_.shutdown(RPCLIB_ASIO::socket_base::shutdown_both, ec);
-    socket_.close(ec);
+    
+    // Use specialized socket_traits to handle different socket types
+    socket_traits<SocketType>::close_socket(socket_, ec);
 }
 
 template <typename SocketType>

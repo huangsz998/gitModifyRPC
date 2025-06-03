@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"E:/modifyRPC/rpclib/build_x86/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -1,0 +1,497 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6E08FF46-C62C-310E-BB78-836A828325BC}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>Win32</Platform>
+    <ProjectName>rpc</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\modifyRPC\rpclib\build_x86\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">rpc.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">rpc</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\modifyRPC\rpclib\build_x86\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">rpc.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">rpc</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">E:\modifyRPC\rpclib\build_x86\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">rpc.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">rpc</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">E:\modifyRPC\rpclib\build_x86\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">rpc.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">rpc</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "E:/modifyRPC/rpclib/dependencies/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "E:/modifyRPC/rpclib/dependencies/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "E:/modifyRPC/rpclib/dependencies/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "E:/modifyRPC/rpclib/dependencies/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_WIN32_WINNT=0x0501;_GNU_SOURCE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_STANDALONE;RPCLIB_ASIO=clmdep_asio;RPCLIB_FMT=clmdep_fmt;RPCLIB_WIN32;RPCLIB_MSGPACK=clmdep_msgpack;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\modifyRPC\rpclib\include;E:\modifyRPC\rpclib\dependencies\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\modifyRPC\rpclib\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule E:/modifyRPC/rpclib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+C:\Users\LeiGod\scoop\apps\cmake\current\bin\cmake.exe -SE:/modifyRPC/rpclib -BE:/modifyRPC/rpclib/build_x86 --check-stamp-file E:/modifyRPC/rpclib/build_x86/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakePackageConfigHelpers.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CheckCXXSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\WriteBasicConfigVersionFile.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCXXCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeRCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeSystem.cmake;E:\modifyRPC\rpclib\cmake\check_warning_flag.cmake;E:\modifyRPC\rpclib\cmake\coverage.cmake;E:\modifyRPC\rpclib\cmake\msvc_support.cmake;E:\modifyRPC\rpclib\cmake\policies.cmake;E:\modifyRPC\rpclib\cmake\rpclibConfig.cmake.in;E:\modifyRPC\rpclib\doc\pages\versions.md.in;E:\modifyRPC\rpclib\include\rpc\config.h.in;E:\modifyRPC\rpclib\include\rpc\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\modifyRPC\rpclib\build_x86\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule E:/modifyRPC/rpclib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+C:\Users\LeiGod\scoop\apps\cmake\current\bin\cmake.exe -SE:/modifyRPC/rpclib -BE:/modifyRPC/rpclib/build_x86 --check-stamp-file E:/modifyRPC/rpclib/build_x86/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakePackageConfigHelpers.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CheckCXXSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\WriteBasicConfigVersionFile.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCXXCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeRCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeSystem.cmake;E:\modifyRPC\rpclib\cmake\check_warning_flag.cmake;E:\modifyRPC\rpclib\cmake\coverage.cmake;E:\modifyRPC\rpclib\cmake\msvc_support.cmake;E:\modifyRPC\rpclib\cmake\policies.cmake;E:\modifyRPC\rpclib\cmake\rpclibConfig.cmake.in;E:\modifyRPC\rpclib\doc\pages\versions.md.in;E:\modifyRPC\rpclib\include\rpc\config.h.in;E:\modifyRPC\rpclib\include\rpc\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\modifyRPC\rpclib\build_x86\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule E:/modifyRPC/rpclib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+C:\Users\LeiGod\scoop\apps\cmake\current\bin\cmake.exe -SE:/modifyRPC/rpclib -BE:/modifyRPC/rpclib/build_x86 --check-stamp-file E:/modifyRPC/rpclib/build_x86/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakePackageConfigHelpers.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CheckCXXSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\WriteBasicConfigVersionFile.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCXXCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeRCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeSystem.cmake;E:\modifyRPC\rpclib\cmake\check_warning_flag.cmake;E:\modifyRPC\rpclib\cmake\coverage.cmake;E:\modifyRPC\rpclib\cmake\msvc_support.cmake;E:\modifyRPC\rpclib\cmake\policies.cmake;E:\modifyRPC\rpclib\cmake\rpclibConfig.cmake.in;E:\modifyRPC\rpclib\doc\pages\versions.md.in;E:\modifyRPC\rpclib\include\rpc\config.h.in;E:\modifyRPC\rpclib\include\rpc\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">E:\modifyRPC\rpclib\build_x86\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule E:/modifyRPC/rpclib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+C:\Users\LeiGod\scoop\apps\cmake\current\bin\cmake.exe -SE:/modifyRPC/rpclib -BE:/modifyRPC/rpclib/build_x86 --check-stamp-file E:/modifyRPC/rpclib/build_x86/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakePackageConfigHelpers.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CheckCXXSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\LeiGod\scoop\apps\cmake\current\share\cmake-4.0\Modules\WriteBasicConfigVersionFile.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeCXXCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeRCCompiler.cmake;E:\modifyRPC\rpclib\build_x86\CMakeFiles\4.0.1\CMakeSystem.cmake;E:\modifyRPC\rpclib\cmake\check_warning_flag.cmake;E:\modifyRPC\rpclib\cmake\coverage.cmake;E:\modifyRPC\rpclib\cmake\msvc_support.cmake;E:\modifyRPC\rpclib\cmake\policies.cmake;E:\modifyRPC\rpclib\cmake\rpclibConfig.cmake.in;E:\modifyRPC\rpclib\doc\pages\versions.md.in;E:\modifyRPC\rpclib\include\rpc\config.h.in;E:\modifyRPC\rpclib\include\rpc\version.h.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">E:\modifyRPC\rpclib\build_x86\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\dispatcher.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\server.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\client.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\this_handler.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\this_session.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\this_server.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\rpc_error.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\detail\server_session.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\detail\response.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\detail\client_error.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\lib\rpc\nonstd\optional.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\dependencies\src\format.cc" />
+    <ClCompile Include="E:\modifyRPC\rpclib\dependencies\src\posix.cc" />
+    <ClInclude Include="E:\modifyRPC\rpclib\dependencies\include\format.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\dependencies\include\gmock\gmock.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\dependencies\include\gtest\gtest.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\dependencies\include\posix.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\client.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\compatibility.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\config.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\all.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\any.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\async_writer.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\bool.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\call.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\client_error.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\constant.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\dev_utils.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\func_tools.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\func_traits.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\if.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\invoke.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\is_specialization_of.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\log.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\make_unique.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\not.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\pimpl.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\response.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\server_pipe_session.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\server_session.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\thread_group.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\util.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\dispatcher.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\fbuffer.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\gcc_atomic.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\object.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\pack.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\pack_define.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\pack_template.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\alpha.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\arm.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\blackfin.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\convex.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\ia64.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\m68k.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\mips.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\parisc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\ppc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\pyramid.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\rs6k.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\sparc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\superh.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\sys370.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\sys390.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\x86.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\x86\32.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\x86\64.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\architecture\z.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\borland.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\clang.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\comeau.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\compaq.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\diab.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\digitalmars.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\dignus.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\edg.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\ekopath.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\gcc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\gcc_xml.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\greenhills.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\hp_acc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\iar.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\ibm.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\intel.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\kai.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\llvm.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\metaware.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\metrowerks.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\microtec.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\mpw.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\palm.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\pgi.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\sgi_mipspro.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\sunpro.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\tendra.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\visualc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\compiler\watcom.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\_cassert.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\_exception.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\comp_detected.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\endian_compat.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\os_detected.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\platform_detected.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\test.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\detail\test_def.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\arm.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\arm\versions.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\ppc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\ppc\versions.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\x86.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\x86\versions.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\x86_amd.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\hardware\simd\x86_amd\versions.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\language.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\language\objc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\language\stdc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\language\stdcpp.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\c.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\c\_prefix.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\c\gnu.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\c\uc.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\c\vms.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\c\zos.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\_prefix.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\cxx.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\dinkumware.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\libcomo.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\modena.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\msl.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\roguewave.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\sgi.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\stdcpp3.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\stlport.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\library\std\vacpp.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\make.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\aix.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\amigaos.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\android.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\beos.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\bsd.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\bsd\bsdi.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\bsd\dragonfly.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\bsd\free.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\bsd\net.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\bsd\open.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\cygwin.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\haiku.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\hpux.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\ios.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\irix.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\linux.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\macos.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\os400.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\qnxnto.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\solaris.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\unix.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\vms.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\os\windows.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\other.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\other\endian.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\platform.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\platform\mingw.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\platform\windows_desktop.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\platform\windows_phone.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\platform\windows_runtime.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\platform\windows_store.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\version.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\predef\version_number.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\sbuffer.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\sysdep.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\unpack.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\unpack_define.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\unpack_template.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\util.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\version.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\version_master.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\vrefbuffer.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\zbuffer.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\msgpack\zone.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\rpc_error.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\server.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\this_handler.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\this_server.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\this_session.h" />
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\version.h" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="E:\modifyRPC\rpclib\build_x86\ZERO_CHECK.vcxproj">
+      <Project>{2D75A7B6-F4D2-3F66-890F-A902A2053078}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

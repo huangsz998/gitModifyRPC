@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <stdint.h>
 #include <thread>
+#include <algorithm>
+#include <iostream>
 
 #include "asio.hpp"
 #include "format.h"
@@ -12,351 +14,468 @@
 #include "rpc/detail/dev_utils.h"
 #include "rpc/detail/log.h"
 #include "rpc/detail/server_session.h"
-#include "rpc/detail/server_pipe_session.h" // 新增头文件
+#include "rpc/detail/server_pipe_session.h"
 #include "rpc/detail/thread_group.h"
 #include "rpc/this_server.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace rpc::detail;
 using RPCLIB_ASIO::ip::tcp;
 using namespace RPCLIB_ASIO;
 
 namespace rpc {
+    extern bool enable_pipe_debug;
+    extern bool enable_message_tracking;
 
-struct server::impl {
-    // 用于存储连接类型
-    enum class conn_type { TCP, NAMED_PIPE };
-    
-    impl(server *parent, std::string const &address, uint16_t port)
-        : parent_(parent),
-          io_(),
-          acceptor_(io_),
-          socket_(io_),
-          suppress_exceptions_(false),
-          conn_type_(conn_type::TCP) {
-        auto ep = tcp::endpoint(ip::address::from_string(address), port);
-        acceptor_.open(ep.protocol());
-#ifndef _WIN32
-        acceptor_.set_option(tcp::acceptor::reuse_address(true));
-#endif // !_WIN32
-        acceptor_.bind(ep);
-        acceptor_.listen();
-    }
+    struct server::impl {
+        enum class conn_type { TCP, NAMED_PIPE };
 
-    impl(server *parent, uint16_t port)
-        : parent_(parent),
-          io_(),
-          acceptor_(io_),
-          socket_(io_),
-          suppress_exceptions_(false),
-          conn_type_(conn_type::TCP) {
-        auto ep = tcp::endpoint(tcp::v4(), port);
-        acceptor_.open(ep.protocol());
+        impl(server *parent, std::string const &address, uint16_t port)
+                : parent_(parent),
+                  io_(),
+                  acceptor_(io_),
+                  socket_(io_),
+                  suppress_exceptions_(false),
+                  conn_type_(conn_type::TCP),
+                  pipe_name_(""),
+                  use_named_pipe_message_mode_(false) {
+            auto ep = tcp::endpoint(ip::address::from_string(address), port);
+            acceptor_.open(ep.protocol());
 #ifndef _WIN32
-        acceptor_.set_option(tcp::acceptor::reuse_address(true));
-#endif // !_WIN32
-        acceptor_.bind(ep);
-        acceptor_.listen();
-    }
-    
-    // Named Pipe 构造函数
-    impl(server *parent, std::string const &pipe_name)
+            acceptor_.set_option(tcp::acceptor::reuse_address(true));
+#endif
+            acceptor_.bind(ep);
+            acceptor_.listen();
+        }
+
+        impl(server *parent, uint16_t port)
+                : parent_(parent),
+                  io_(),
+                  acceptor_(io_),
+                  socket_(io_),
+                  suppress_exceptions_(false),
+                  conn_type_(conn_type::TCP),
+                  pipe_name_(""),
+                  use_named_pipe_message_mode_(false) {
+            auto ep = tcp::endpoint(tcp::v4(), port);
+            acceptor_.open(ep.protocol());
+#ifndef _WIN32
+            acceptor_.set_option(tcp::acceptor::reuse_address(true));
+#endif
+            acceptor_.bind(ep);
+            acceptor_.listen();
+        }
+
+#ifndef _WIN32
+        // Unix Domain Socket
+        impl(server *parent, std::string const &pipe_name)
+                : parent_(parent),
+                  io_(),
+                  acceptor_(io_),
+                  socket_(io_),
+                  suppress_exceptions_(false),
+                  conn_type_(conn_type::NAMED_PIPE),
+                  pipe_name_(pipe_name),
+                  use_named_pipe_message_mode_(false) {
+            ::unlink(pipe_name.c_str());
+            pipe_acceptor_.reset(new local::stream_protocol::acceptor(
+                    io_, local::stream_protocol::endpoint(pipe_name)));
+            pipe_socket_.reset(new local::stream_protocol::socket(io_));
+            LOG_INFO("Created server with Unix Domain Socket: {}", pipe_name);
+        }
+#else
+        // Windows Named Pipe
+        impl(server *parent, std::string const &pipe_name)
         : parent_(parent),
           io_(),
           acceptor_(io_),
           socket_(io_),
           suppress_exceptions_(false),
           conn_type_(conn_type::NAMED_PIPE),
-          pipe_name_(pipe_name) {
-#ifdef _WIN32
-        // Windows平台下的Named Pipe实现
-        pipe_acceptor_.reset(new local::windows::stream_protocol::acceptor(
-            io_, local::windows::stream_protocol::endpoint("\\\\.\\pipe\\" + pipe_name)));
-        pipe_socket_.reset(new local::windows::stream_protocol::socket(io_));
-#else
-        // Unix平台下的Named Pipe实现 (Unix Domain Socket)
-        ::unlink(pipe_name.c_str()); // 删除可能存在的旧socket文件
-        pipe_acceptor_.reset(new local::stream_protocol::acceptor(
-            io_, local::stream_protocol::endpoint(pipe_name)));
-        pipe_socket_.reset(new local::stream_protocol::socket(io_));
-#endif
-        LOG_INFO("Created server with named pipe: {}", pipe_name);
-    }
-
-    void start_accept() {
-        if (conn_type_ == conn_type::TCP) {
-            acceptor_.async_accept(socket_, [this](std::error_code ec) {
-                if (!ec) {
-                    auto ep = socket_.remote_endpoint();
-                    LOG_INFO("Accepted TCP connection from {}:{}", ep.address(),
-                             ep.port());
-                    auto s = std::make_shared<server_session>(
-                        parent_, &io_, std::move(socket_), parent_->disp_,
-                        suppress_exceptions_);
-                    s->start();
-                    std::unique_lock<std::mutex> lock(sessions_mutex_);
-                    sessions_.push_back(s);
-                    tcp_sessions_.push_back(s);
-                } else {
-                    LOG_ERROR("Error while accepting TCP connection: {}", ec);
-                }
-                if (!this_server().stopping())
-                    start_accept();
-            });
-        } else { // NAMED_PIPE
-#ifdef _WIN32
-            pipe_acceptor_->async_accept(*pipe_socket_, [this](std::error_code ec) {
-                if (!ec) {
-                    LOG_INFO("Accepted Named Pipe connection");
-                    using PipeSocketType = local::windows::stream_protocol::socket;
-                    auto s = std::make_shared<server_pipe_session<PipeSocketType>>(
-                        parent_, &io_, std::move(*pipe_socket_), parent_->disp_,
-                        suppress_exceptions_);
-                    s->start();
-                    std::unique_lock<std::mutex> lock(sessions_mutex_);
-                    sessions_.push_back(s);
-                    pipe_sessions_.push_back(s);
-                    // 创建新的socket用于下一个连接
-                    pipe_socket_.reset(new local::windows::stream_protocol::socket(io_));
-                } else {
-                    LOG_ERROR("Error while accepting Named Pipe connection: {}", ec);
-                }
-                if (!this_server().stopping())
-                    start_accept();
-            });
-#else
-            pipe_acceptor_->async_accept(*pipe_socket_, [this](std::error_code ec) {
-                if (!ec) {
-                    LOG_INFO("Accepted Unix Domain Socket connection");
-                    using PipeSocketType = local::stream_protocol::socket;
-                    auto s = std::make_shared<server_pipe_session<PipeSocketType>>(
-                        parent_, &io_, std::move(*pipe_socket_), parent_->disp_,
-                        suppress_exceptions_);
-                    s->start();
-                    std::unique_lock<std::mutex> lock(sessions_mutex_);
-                    sessions_.push_back(s);
-                    pipe_sessions_.push_back(s);
-                    // 创建新的socket用于下一个连接
-                    pipe_socket_.reset(new local::stream_protocol::socket(io_));
-                } else {
-                    LOG_ERROR("Error while accepting Unix Domain Socket connection: {}", ec);
-                }
-                if (!this_server().stopping())
-                    start_accept();
-            });
-#endif
+          pipe_name_(pipe_name),
+          use_named_pipe_message_mode_(true) {
+            full_pipe_name_ = "\\\\.\\pipe\\" + pipe_name;
+            LOG_INFO("Creating Windows Named Pipe: {}", full_pipe_name_);
+            std::cout << "Creating Windows Named Pipe: " << full_pipe_name_ << std::endl;
+            pipe_handle_ = CreateNamedPipeA(
+                full_pipe_name_.c_str(),
+                PIPE_ACCESS_DUPLEX, // Must NOT include FILE_FLAG_OVERLAPPED
+                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                PIPE_UNLIMITED_INSTANCES,
+                8192, 8192, 0, NULL);
+            if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                DWORD error = GetLastError();
+                std::string err_msg = RPCLIB_FMT::format(
+                    "Failed to create Windows Named Pipe: {}, error code: {}",
+                    full_pipe_name_, error);
+                LOG_ERROR(err_msg);
+                throw std::runtime_error(err_msg);
+            }
+            LOG_INFO("Created server with Windows Named Pipe: {}", full_pipe_name_);
+            std::cout << "Created server with Windows Named Pipe: " << full_pipe_name_ << std::endl;
         }
-    }
+#endif
 
-    void close_sessions() {
-        std::unique_lock<std::mutex> lock(sessions_mutex_);
-        // 分别复制TCP和管道会话列表，避免void*指针的类型问题
-        auto tcp_sessions_copy = tcp_sessions_;
-        auto pipe_sessions_copy = pipe_sessions_;
-        sessions_.clear();
-        tcp_sessions_.clear();
-        pipe_sessions_.clear();
-        lock.unlock();
-
-        // 关闭所有TCP会话
-        for (auto &session : tcp_sessions_copy) {
-            session->close();
+#ifdef _WIN32
+        void convert_to_named_pipe(std::string const &pipe_name) {
+            acceptor_.close();
+            socket_.close();
+            conn_type_ = conn_type::NAMED_PIPE;
+            pipe_name_ = pipe_name;
+            use_named_pipe_message_mode_ = true;
+            full_pipe_name_ = "\\\\.\\pipe\\" + pipe_name;
+            LOG_INFO("Creating Windows Named Pipe: {}", full_pipe_name_);
+            std::cout << "Creating Windows Named Pipe: " << full_pipe_name_ << std::endl;
+            pipe_handle_ = CreateNamedPipeA(
+                full_pipe_name_.c_str(),
+                PIPE_ACCESS_DUPLEX,
+                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                PIPE_UNLIMITED_INSTANCES,
+                8192, 8192, 0, NULL);
+            if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                DWORD error = GetLastError();
+                std::string err_msg = RPCLIB_FMT::format(
+                    "Failed to create Windows Named Pipe: {}, error code: {}",
+                    full_pipe_name_, error);
+                LOG_ERROR(err_msg);
+                throw std::runtime_error(err_msg);
+            }
+            LOG_INFO("Created server with Windows Named Pipe: {}", full_pipe_name_);
+            std::cout << "Created server with Windows Named Pipe: " << full_pipe_name_ << std::endl;
         }
-        
-        // 关闭所有管道会话(这里不使用void*指针)
-        // 此处省略管道会话的关闭，实际会在各个会话被销毁时自动处理
 
-        if (this_server().stopping()) {
+        void set_named_pipe_options() {
+            use_named_pipe_message_mode_ = true;
+            LOG_INFO("Server configured to use named pipe message mode");
+            std::cout << "Server configured to use named pipe message mode" << std::endl;
+            if (enable_pipe_debug) {
+                LOG_INFO("Pipe debugging is enabled for server");
+                std::cout << "Pipe debugging is enabled for server" << std::endl;
+            }
+        }
+#endif
+
+        void start_accept() {
             if (conn_type_ == conn_type::TCP) {
-                acceptor_.cancel();
-            } else {
+                acceptor_.async_accept(socket_, [this](std::error_code ec) {
+                    if (!ec) {
+                        auto ep = socket_.remote_endpoint();
+                        LOG_INFO("Accepted TCP connection from {}:{}", ep.address(), ep.port());
+                        auto s = std::make_shared<server_session>( parent_, &io_, std::move(socket_), parent_->disp_, suppress_exceptions_);
+                        s->start();
+                        std::unique_lock<std::mutex> lock(sessions_mutex_);
+                        sessions_.push_back(s);
+                        tcp_sessions_.push_back(s);
+                    } else {
+                        LOG_ERROR("Error while accepting TCP connection: {}", ec);
+                    }
+                    if (!this_server().stopping())
+                        start_accept();
+                });
+            }
 #ifdef _WIN32
-                pipe_acceptor_->cancel();
+            else {
+                if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                    LOG_ERROR("Invalid pipe handle when trying to accept connection");
+                    std::cerr << "Invalid pipe handle when trying to accept connection" << std::endl;
+                    return;
+                }
+                io_.post([this]() {
+                    try {
+                        LOG_INFO("Waiting for client connection on pipe: {}", pipe_name_);
+                        std::cout << "Waiting for client connection on pipe: " << pipe_name_ << std::endl;
+                        BOOL connected = ConnectNamedPipe(pipe_handle_, NULL);
+                        DWORD last_error = GetLastError();
+                        if (connected || last_error == ERROR_PIPE_CONNECTED) {
+                            LOG_INFO("Client connected to Windows Named Pipe");
+                            std::cout << "Client connected to pipe" << std::endl;
+                            HANDLE session_handle = pipe_handle_;
+                            // Create a new pipe instance for the next connection
+                            pipe_handle_ = CreateNamedPipeA(
+                                full_pipe_name_.c_str(),
+                                PIPE_ACCESS_DUPLEX,
+                                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                                PIPE_UNLIMITED_INSTANCES,
+                                8192, 8192, 0, NULL);
+                            if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                                DWORD error = GetLastError();
+                                LOG_ERROR("Failed to create new pipe instance: {}", error);
+                            }
+                            DWORD mode = PIPE_READMODE_MESSAGE;
+                            if (!SetNamedPipeHandleState(session_handle, &mode, NULL, NULL)) {
+                                DWORD error = GetLastError();
+                                LOG_ERROR("Failed to set pipe mode to message mode: {}", error);
+                                CloseHandle(session_handle);
+                                throw std::runtime_error("Failed to set pipe mode");
+                            }
+                            try {
+                                auto session = std::make_shared<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>>(
+                                    parent_, &io_, RPCLIB_ASIO::windows::stream_handle(io_, session_handle),
+                                    parent_->disp_, suppress_exceptions_);
+                                if (use_named_pipe_message_mode_) {
+                                    session->set_message_mode(true);
+                                    LOG_INFO("Created pipe session with message mode enabled");
+                                }
+                                session->start();
+                                std::unique_lock<std::mutex> lock(sessions_mutex_);
+                                sessions_.push_back(session);
+                                win_pipe_sessions_.push_back(session);
+                            } catch (const std::exception& ex) {
+                                LOG_ERROR("Exception creating pipe session: {}", ex.what());
+                                std::cerr << "Exception creating pipe session: " << ex.what() << std::endl;
+                            }
+                            if (!this_server().stopping())
+                                start_accept();
+                        } else {
+                            if (!this_server().stopping())
+                                start_accept();
+                        }
+                    } catch (const std::exception &e) {
+                        LOG_ERROR("Exception in pipe acceptance: {}", e.what());
+                        std::cerr << "Pipe acceptance exception: " << e.what() << std::endl;
+                        if (pipe_handle_ != INVALID_HANDLE_VALUE) {
+                            DisconnectNamedPipe(pipe_handle_);
+                            CloseHandle(pipe_handle_);
+                            pipe_handle_ = CreateNamedPipeA(
+                                full_pipe_name_.c_str(),
+                                PIPE_ACCESS_DUPLEX,
+                                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                                PIPE_UNLIMITED_INSTANCES,
+                                8192, 8192, 0, NULL);
+                        }
+                        if (!this_server().stopping())
+                            io_.post([this]() { start_accept(); });
+                    }
+                });
+            }
 #else
-                pipe_acceptor_->cancel();
-                ::unlink(pipe_name_.c_str()); // 清理Unix Domain Socket文件
+            else {
+                pipe_acceptor_->async_accept(*pipe_socket_, [this](std::error_code ec) {
+                    if (!ec) {
+                        LOG_INFO("Accepted Unix Domain Socket connection");
+                        using PipeSocketType = local::stream_protocol::socket;
+                        auto s = std::make_shared<server_pipe_session<PipeSocketType>>(
+                                parent_, &io_, std::move(*pipe_socket_), parent_->disp_,
+                                        suppress_exceptions_);
+                        s->start();
+                        std::unique_lock<std::mutex> lock(sessions_mutex_);
+                        sessions_.push_back(s);
+                        unix_pipe_sessions_.push_back(s);
+                        pipe_socket_.reset(new local::stream_protocol::socket(io_));
+                    } else {
+                        LOG_ERROR("Error while accepting Unix Domain Socket connection: {}", ec);
+                    }
+                    if (!this_server().stopping())
+                        start_accept();
+                });
+            }
 #endif
-            }
         }
-    }
 
-    void stop() {
-        io_.stop();
-        loop_workers_.join_all();
-        
-        if (conn_type_ == conn_type::NAMED_PIPE) {
-#ifndef _WIN32
-            ::unlink(pipe_name_.c_str()); // 清理Unix Domain Socket文件
-#endif
-        }
-    }
-
-    // 用于TCP session的close方法
-    void close_tcp_session(std::shared_ptr<server_session> const &s) {
-        std::unique_lock<std::mutex> lock(sessions_mutex_);
-        // 从TCP sessions列表中删除
-        auto it_tcp = std::find(begin(tcp_sessions_), end(tcp_sessions_), s);
-        if (it_tcp != end(tcp_sessions_)) {
-            tcp_sessions_.erase(it_tcp);
-        }
-        
-        // 从通用sessions列表中删除
-        auto it = std::find(begin(sessions_), end(sessions_), static_cast<std::shared_ptr<void>>(s));
-        if (it != end(sessions_)) {
-            sessions_.erase(it);
-        }
-    }
-    
-    // 用于Pipe session的close方法
-    template<typename SocketType>
-    void close_pipe_session(std::shared_ptr<server_pipe_session<SocketType>> const &s) {
-        std::unique_lock<std::mutex> lock(sessions_mutex_);
-        
-        // 从pipe sessions列表中删除，通过确切类型转换比较指针
-        for (auto it = pipe_sessions_.begin(); it != pipe_sessions_.end(); ++it) {
-            auto ptr = std::static_pointer_cast<server_pipe_session<SocketType>>(*it);
-            if (ptr.get() == s.get()) {
-                pipe_sessions_.erase(it);
-                break;
-            }
-        }
-        
-        // 从通用sessions列表中删除
-        for (auto it = sessions_.begin(); it != sessions_.end(); ++it) {
-            // 直接比较指针地址
-            if (it->get() == s.get()) {
-                sessions_.erase(it);
-                break;
-            }
-        }
-    }
-
-    unsigned short port() const { 
-        if (conn_type_ == conn_type::TCP) {
-            return acceptor_.local_endpoint().port(); 
-        }
-        return 0; // Named Pipe模式下返回0
-    }
-    
-    std::string pipe_name() const {
-        return pipe_name_;
-    }
-    
-    server::connection_type get_connection_type() const {
-        return conn_type_ == conn_type::TCP ? 
-               server::connection_type::TCP : 
-               server::connection_type::NAMED_PIPE;
-    }
-
-    server *parent_;
-    io_service io_;
-    ip::tcp::acceptor acceptor_;
-    ip::tcp::socket socket_;
-    
-    // Named Pipe相关成员
+        void close_sessions() {
+            std::unique_lock<std::mutex> lock(sessions_mutex_);
+            auto tcp_sessions_copy = tcp_sessions_;
 #ifdef _WIN32
-    std::unique_ptr<local::windows::stream_protocol::acceptor> pipe_acceptor_;
-    std::unique_ptr<local::windows::stream_protocol::socket> pipe_socket_;
+            auto win_pipe_sessions_copy = win_pipe_sessions_;
 #else
-    std::unique_ptr<local::stream_protocol::acceptor> pipe_acceptor_;
-    std::unique_ptr<local::stream_protocol::socket> pipe_socket_;
+            auto unix_pipe_sessions_copy = unix_pipe_sessions_;
 #endif
-    std::string pipe_name_;
-    
-    rpc::detail::thread_group loop_workers_;
-    std::vector<std::shared_ptr<void>> sessions_;        // 所有会话的混合容器
-    std::vector<std::shared_ptr<server_session>> tcp_sessions_; // TCP会话容器
-    std::vector<std::shared_ptr<void>> pipe_sessions_;   // Named Pipe会话容器
-    std::atomic_bool suppress_exceptions_;
-    conn_type conn_type_;
+            sessions_.clear();
+            tcp_sessions_.clear();
+#ifdef _WIN32
+            win_pipe_sessions_.clear();
+#else
+            unix_pipe_sessions_.clear();
+#endif
+            lock.unlock();
+            for (auto &session : tcp_sessions_copy) session->close();
+#ifdef _WIN32
+            for (auto &session : win_pipe_sessions_copy) session->close();
+#else
+            for (auto &session : unix_pipe_sessions_copy) session->close();
+#endif
+            if (this_server().stopping()) {
+                if (conn_type_ == conn_type::TCP) {
+                    acceptor_.cancel();
+                } else {
+#ifdef _WIN32
+                    if (pipe_handle_ != INVALID_HANDLE_VALUE) {
+                        DisconnectNamedPipe(pipe_handle_);
+                        CloseHandle(pipe_handle_);
+                        pipe_handle_ = INVALID_HANDLE_VALUE;
+                    }
+#else
+                    pipe_acceptor_->cancel();
+                    ::unlink(pipe_name_.c_str());
+#endif
+                }
+            }
+        }
+
+        void stop() {
+            io_.stop();
+            loop_workers_.join_all();
+            if (conn_type_ == conn_type::NAMED_PIPE) {
+#ifdef _WIN32
+                if (pipe_handle_ != INVALID_HANDLE_VALUE) {
+                    DisconnectNamedPipe(pipe_handle_);
+                    CloseHandle(pipe_handle_);
+                    pipe_handle_ = INVALID_HANDLE_VALUE;
+                }
+#else
+                ::unlink(pipe_name_.c_str());
+#endif
+            }
+        }
+
+        void close_tcp_session(std::shared_ptr<server_session> const &s) {
+            std::unique_lock<std::mutex> lock(sessions_mutex_);
+            auto it_tcp = std::find(begin(tcp_sessions_), end(tcp_sessions_), s);
+            if (it_tcp != end(tcp_sessions_)) tcp_sessions_.erase(it_tcp);
+            auto it = std::find(begin(sessions_), end(sessions_), static_cast<std::shared_ptr<void>>(s));
+            if (it != end(sessions_)) sessions_.erase(it);
+        }
+#ifdef _WIN32
+        void close_pipe_session(std::shared_ptr<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>> const &s) {
+            std::unique_lock<std::mutex> lock(sessions_mutex_);
+            auto it_pipe = std::find(begin(win_pipe_sessions_), end(win_pipe_sessions_), s);
+            if (it_pipe != end(win_pipe_sessions_)) win_pipe_sessions_.erase(it_pipe);
+            auto it = std::find(begin(sessions_), end(sessions_), static_cast<std::shared_ptr<void>>(s));
+            if (it != end(sessions_)) sessions_.erase(it);
+        }
+#else
+        void close_pipe_session(std::shared_ptr<server_pipe_session<local::stream_protocol::socket>> const &s) {
+            std::unique_lock<std::mutex> lock(sessions_mutex_);
+            auto it_pipe = std::find(begin(unix_pipe_sessions_), end(unix_pipe_sessions_), s);
+            if (it_pipe != end(unix_pipe_sessions_)) unix_pipe_sessions_.erase(it_pipe);
+            auto it = std::find(begin(sessions_), end(sessions_), static_cast<std::shared_ptr<void>>(s));
+            if (it != end(sessions_)) sessions_.erase(it);
+        }
+#endif
+        unsigned short port() const {
+            if (conn_type_ == conn_type::TCP) return acceptor_.local_endpoint().port();
+            return 0;
+        }
+        std::string pipe_name() const { return pipe_name_; }
+        server::connection_type get_connection_type() const {
+            return conn_type_ == conn_type::TCP ?
+                server::connection_type::TCP :
+                server::connection_type::NAMED_PIPE;
+        }
+
+        server *parent_;
+        io_service io_;
+        ip::tcp::acceptor acceptor_;
+        ip::tcp::socket socket_;
+#ifdef _WIN32
+        HANDLE pipe_handle_ = INVALID_HANDLE_VALUE;
+        std::string full_pipe_name_;
+#else
+        std::unique_ptr<local::stream_protocol::acceptor> pipe_acceptor_;
+        std::unique_ptr<local::stream_protocol::socket> pipe_socket_;
+#endif
+        std::string pipe_name_;
+        rpc::detail::thread_group loop_workers_;
+        std::vector<std::shared_ptr<void>> sessions_;
+        std::vector<std::shared_ptr<server_session>> tcp_sessions_;
+#ifdef _WIN32
+        std::vector<std::shared_ptr<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>>> win_pipe_sessions_;
+#else
+        std::vector<std::shared_ptr<server_pipe_session<local::stream_protocol::socket>>> unix_pipe_sessions_;
+#endif
+        std::atomic_bool suppress_exceptions_;
+        conn_type conn_type_;
+        bool use_named_pipe_message_mode_;
+        RPCLIB_CREATE_LOG_CHANNEL(server)
+        std::mutex sessions_mutex_;
+    };
+
     RPCLIB_CREATE_LOG_CHANNEL(server)
-    std::mutex sessions_mutex_;
-};
 
-RPCLIB_CREATE_LOG_CHANNEL(server)
-
-server::server(uint16_t port)
-    : pimpl(new server::impl(this, port)),
-      disp_(std::make_shared<dispatcher>()) {
-    LOG_INFO("Created server on localhost:{}", port);
-    pimpl->start_accept();
-}
-
-server::server(server &&other) noexcept { *this = std::move(other); }
-
-server::server(std::string const &address, uint16_t port)
-    : pimpl(new server::impl(this, address, port)),
-      disp_(std::make_shared<dispatcher>()) {
-    LOG_INFO("Created server on address {}:{}", address, port);
-    pimpl->start_accept();
-}
-
-// 新增的Named Pipe构造函数实现
-server::server(std::string const &pipe_name)
-    : pimpl(new server::impl(this, pipe_name)),
-      disp_(std::make_shared<dispatcher>()) {
-    pimpl->start_accept();
-}
-
-server::~server() {
-    if (pimpl) {
-        pimpl->stop();
+    server::server(uint16_t port)
+            : pimpl(new server::impl(this, port)),
+              disp_(std::make_shared<dispatcher>()) {
+        LOG_INFO("Created server on localhost:{}", port);
+        pimpl->start_accept();
     }
-}
 
-server &server::operator=(server &&other) {
-    if (this != &other) {
-        pimpl = std::move(other.pimpl);
-        other.pimpl = nullptr;
-        disp_ = std::move(other.disp_);
-        other.disp_ = nullptr;
+    server::server(server &&other) noexcept {
+        *this = std::move(other);
     }
-    return *this;
-}
 
-void server::suppress_exceptions(bool suppress) {
-    pimpl->suppress_exceptions_ = suppress;
-}
+    server::server(std::string const &address, uint16_t port)
+            : pimpl(new server::impl(this, address, port)),
+              disp_(std::make_shared<dispatcher>()) {
+        LOG_INFO("Created server on address {}:{}", address, port);
+        pimpl->start_accept();
+    }
 
-void server::run() { pimpl->io_.run(); }
+    server::server(std::string const &pipe_name)
+            : pimpl(new server::impl(this, pipe_name)),
+              disp_(std::make_shared<dispatcher>()) {
+        LOG_INFO("Created server with Named Pipe: {}", pipe_name);
+        pimpl->start_accept();
+    }
 
-void server::async_run(std::size_t worker_threads) {
-    pimpl->loop_workers_.create_threads(worker_threads, [this]() {
-        name_thread("server");
-        LOG_INFO("Starting");
-        pimpl->io_.run();
-        LOG_INFO("Exiting");
-    });
-}
-
-void server::stop() { pimpl->stop(); }
-
-unsigned short server::port() const { return pimpl->port(); }
-
-std::string server::pipe_name() const { return pimpl->pipe_name(); }
-
-server::connection_type server::get_connection_type() const {
-    return pimpl->get_connection_type();
-}
-
-void server::close_sessions() { pimpl->close_sessions(); }
-
-// 原有的TCP会话关闭方法
-void server::close_session(std::shared_ptr<detail::server_session> const &s) {
-    pimpl->close_tcp_session(s);
-}
-
-template<typename SocketType>
-void server::close_pipe_session(std::shared_ptr<detail::server_pipe_session<SocketType>> const &s) {
-    pimpl->close_pipe_session(s);
-}
-
-// 显式实例化模板
+    std::shared_ptr<server> server::create_named_pipe_server(const std::string &pipe_name) {
 #ifdef _WIN32
-template void server::close_pipe_session<local::windows::stream_protocol::socket>(
-    std::shared_ptr<detail::server_pipe_session<local::windows::stream_protocol::socket>> const &);
+        std::shared_ptr<server> srv = std::make_shared<server>(0);
+        srv->pimpl->convert_to_named_pipe(pipe_name);
+        srv->pimpl->set_named_pipe_options();
+        srv->pimpl->start_accept();
+        return srv;
 #else
-template void server::close_pipe_session<local::stream_protocol::socket>(
-    std::shared_ptr<detail::server_pipe_session<local::stream_protocol::socket>> const &);
+        auto srv = std::make_shared<server>(pipe_name);
+        return srv;
 #endif
+    }
 
+    server::~server() {
+        if (pimpl) pimpl->stop();
+    }
+
+    server &server::operator=(server &&other) {
+        if (this != &other) {
+            pimpl = std::move(other.pimpl);
+            other.pimpl = nullptr;
+            disp_ = std::move(other.disp_);
+            other.disp_ = nullptr;
+        }
+        return *this;
+    }
+
+    void server::suppress_exceptions(bool suppress) {
+        pimpl->suppress_exceptions_ = suppress;
+    }
+    void server::run() { pimpl->io_.run(); }
+    void server::async_run(std::size_t worker_threads) {
+        pimpl->loop_workers_.create_threads(worker_threads, [this]() {
+            name_thread("server");
+            LOG_INFO("Starting");
+            pimpl->io_.run();
+            LOG_INFO("Exiting");
+        });
+    }
+    void server::stop() { pimpl->stop(); }
+    unsigned short server::port() const { return pimpl->port(); }
+    std::string server::pipe_name() const { return pimpl->pipe_name(); }
+    server::connection_type server::get_connection_type() const { return pimpl->get_connection_type(); }
+    void server::close_sessions() { pimpl->close_sessions(); }
+    void server::close_session(std::shared_ptr<detail::server_session> const &s) { pimpl->close_tcp_session(s); }
+#ifdef _WIN32
+    template <>
+    void server::close_pipe_session<RPCLIB_ASIO::windows::stream_handle>(std::shared_ptr<detail::server_pipe_session<RPCLIB_ASIO::windows::stream_handle>> const &s) {
+        pimpl->close_pipe_session(s);
+    }
+#else
+    template <>
+    void server::close_pipe_session<local::stream_protocol::socket>(std::shared_ptr<detail::server_pipe_session<local::stream_protocol::socket>> const &s) {
+        pimpl->close_pipe_session(s);
+    }
+#endif
 } // namespace rpc
