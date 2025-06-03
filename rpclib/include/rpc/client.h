@@ -11,12 +11,6 @@
 #include "rpc/msgpack.hpp"
 
 namespace rpc {
-    
-    extern bool enable_pipe_debug;
-    extern bool enable_message_tracking;
-    
-    void enable_pipe_debugging(bool enable = true);
-
     namespace detail {
     template<typename SocketType> 
     class async_writer;

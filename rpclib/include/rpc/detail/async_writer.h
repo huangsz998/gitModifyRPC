@@ -9,7 +9,6 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <type_traits>
 
 #include "asio.hpp"
 
@@ -19,64 +18,7 @@
 namespace rpc {
 namespace detail {
 
-// Forward declaration helper function
-template <typename SocketType>
-struct socket_traits {
-    static void close_socket(SocketType& socket, std::error_code& ec) {
-        // Default implementation: call both shutdown and close
-        socket.shutdown(RPCLIB_ASIO::socket_base::shutdown_both, ec);
-        socket.close(ec);
-    }
-};
-
-// Windows platform stream_handle specialization
-#ifdef _WIN32
-template <>
-struct socket_traits<RPCLIB_ASIO::windows::stream_handle> {
-    static void close_socket(RPCLIB_ASIO::windows::stream_handle& socket, std::error_code& ec) {
-        // Windows stream_handle has no shutdown method, just call close
-        socket.close(ec);
-    }
-};
-#endif
-
-// Helper function for writing to different socket types - FIXED WITH COMMON INTERFACE
-template <typename T>
-inline void write_helper(T &s, RPCLIB_MSGPACK::sbuffer &buf, bool /* message_mode */ = false) {
-    // Standard async_write for most socket types
-    RPCLIB_ASIO::async_write(
-        s, RPCLIB_ASIO::buffer(buf.data(), buf.size()),
-        [](std::error_code, std::size_t) {});
-}
-
-#ifdef _WIN32
-// Specialized write helper for Windows Named Pipes with message mode support
-template <>
-inline void write_helper<RPCLIB_ASIO::windows::stream_handle>(
-    RPCLIB_ASIO::windows::stream_handle &s, 
-    RPCLIB_MSGPACK::sbuffer &buf, 
-    bool message_mode) {
-        
-    if (message_mode) {
-        // For message mode, use synchronous writes to ensure complete message
-        try {
-            RPCLIB_ASIO::write(
-                s, RPCLIB_ASIO::buffer(buf.data(), buf.size()));
-        }
-        catch (const std::exception&) {
-            // Handle write errors - log if needed
-            // Note: Using parameter variable so compiler won't warn
-        }
-    } else {
-        // Standard byte-oriented async write
-        RPCLIB_ASIO::async_write(
-            s, RPCLIB_ASIO::buffer(buf.data(), buf.size()),
-            [](std::error_code, std::size_t) {});
-    }
-}
-#endif
-
-//! \brief Template class to support different socket types
+//! \brief 改造为模板类以支持不同类型的socket
 template <typename SocketType>
 class async_writer : public std::enable_shared_from_this<async_writer<SocketType>> {
 public:
@@ -85,8 +27,7 @@ public:
           write_strand_(*io),
           is_writing_(false),
           exit_(false),
-          is_closed_(false),
-          message_mode_(false) {} // Added message_mode_ flag initialization
+          is_closed_(false) {}
 
     void write(RPCLIB_MSGPACK::sbuffer &&data);
     
@@ -97,16 +38,6 @@ public:
     void close();
     
     bool is_closed() const;
-    
-    // Add setter for message mode
-    void set_message_mode(bool enabled) {
-        message_mode_ = enabled;
-    }
-    
-    // Add getter for message mode
-    bool get_message_mode() const {
-        return message_mode_;
-    }
 
 protected:
     template <typename T>
@@ -123,13 +54,12 @@ private:
     std::deque<RPCLIB_MSGPACK::sbuffer> write_queue_;
     std::atomic_bool exit_;
     std::atomic_bool is_closed_;
-    bool message_mode_; // Flag to indicate if using message mode
 };
 
-// Specialized as original type for backward compatibility
+// 特化为原始类型，用于向后兼容
 using async_writer_tcp = async_writer<RPCLIB_ASIO::ip::tcp::socket>;
 
-// Template implementation part
+// 模板实现部分
 template <typename SocketType>
 void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
     write_queue_.push_back(std::move(data));
@@ -141,25 +71,6 @@ void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
                 return;
             }
             auto &item = write_queue_.front();
-            
-#ifdef _WIN32
-            // Check if this is a Windows named pipe with message mode
-            if (std::is_same<SocketType, RPCLIB_ASIO::windows::stream_handle>::value && message_mode_) {
-                // Use specialized helper for Windows Named Pipes
-                write_helper(socket_, item, message_mode_);
-                
-                // Handle completion directly for message mode
-                write_queue_.pop_front();
-                is_writing_ = false;
-                
-                // Process next item in queue if any
-                if (!write_queue_.empty() && !exit_) {
-                    write(std::move(RPCLIB_MSGPACK::sbuffer())); // Dummy to trigger processing
-                }
-                return;
-            }
-#endif
-            // Standard async write for non-Windows or non-message mode
             socket_.async_write_some(
                 RPCLIB_ASIO::buffer(item.data(), item.size()),
                 write_strand_.wrap(
@@ -178,7 +89,7 @@ void async_writer<SocketType>::write_handler(std::error_code ec, std::size_t tra
     
     if (!ec) {
         if (transferred < write_queue_.front().size()) {
-            // sbuffer has no consume method, we need to create a new buffer
+            // sbuffer没有consume方法，我们需要创建一个新的缓冲区
             RPCLIB_MSGPACK::sbuffer new_buf;
             const size_t remaining = write_queue_.front().size() - transferred;
             new_buf.write(write_queue_.front().data() + transferred, remaining);
@@ -238,9 +149,8 @@ void async_writer<SocketType>::close() {
     exit_ = true;
     is_closed_ = true;
     std::error_code ec;
-    
-    // Use specialized socket_traits to handle different socket types
-    socket_traits<SocketType>::close_socket(socket_, ec);
+    socket_.shutdown(RPCLIB_ASIO::socket_base::shutdown_both, ec);
+    socket_.close(ec);
 }
 
 template <typename SocketType>

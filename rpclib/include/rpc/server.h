@@ -2,20 +2,18 @@
 #define SERVER_H_S0HB5KXY
 
 #include "rpc/config.h"
-#include "rpc/dispatcher.h"
 #include "rpc/msgpack.hpp"
+#include "rpc/dispatcher.h"
 
 #include "rpc/detail/pimpl.h"
 #include <string>
-#include <memory>
-
-static bool enable_pipe_debug = false;
 
 namespace rpc {
-namespace detail {
-template <typename SocketType> class server_pipe_session;
-class server_session;
-} // namespace detail
+    namespace detail {
+    template<typename SocketType>
+    class server_pipe_session;
+    class server_session;
+}
 
 //! \brief Implements a msgpack-rpc server. This is the main interfacing
 //! point with the library for creating servers.
@@ -29,10 +27,10 @@ class server_session;
 //! This class is not copyable, but moveable.
 class server {
 public:
-    //! \brief Communication type enumeration
+    //! \brief 通信类型枚举
     enum class connection_type {
-        TCP,       //!< Using TCP communication
-        NAMED_PIPE //!< Using Named Pipe communication
+        TCP,      //!< 使用TCP通信
+        NAMED_PIPE //!< 使用Named Pipe通信
     };
 
     //! \brief Constructs a server that listens on the localhost on the
@@ -45,7 +43,7 @@ public:
     //! move assignment operator.
     //!
     //! \param other The other instance to move from.
-    server(server &&other) noexcept;
+    server(server&& other) noexcept;
 
     //! \brief Constructs a server that listens on the specified address on
     //! the specified port.
@@ -54,16 +52,11 @@ public:
     //! network adapaters control the given address.
     //! \param port The port number to listen on.
     server(std::string const &address, uint16_t port);
-
-    //! \brief Constructs a server that uses Named Pipe communication
-    //! 
-    //! \param pipe_name The name of the Named Pipe
+    
+    //! \brief 构造一个使用Named Pipe通信的服务器
+    //!
+    //! \param pipe_name Named Pipe的名称
     explicit server(std::string const &pipe_name);
-
-    //! \brief Creates a Named Pipe server (Factory method, works on all platforms)
-    //! \param pipe_name The name of the Named Pipe
-    //! \return The created server object
-    static std::shared_ptr<server> create_named_pipe_server(std::string const &pipe_name);
 
     //! \brief Destructor.
     //!
@@ -74,7 +67,7 @@ public:
     //!
     //! \param other The other instance to move from.
     //! \return The result of the assignment.
-    server &operator=(server &&other);
+    server& operator=(server&& other);
 
     //! \brief Starts the server loop. This is a blocking call.
     //!
@@ -113,19 +106,22 @@ public:
 
     //! \brief Unbinds a functor binded to a name.
     //!
-    //! This function removes already binded function from RPC Ccallable
-    //! functions
+    //! This function removes already binded function from RPC Ccallable functions
     //!
     //! \param name The name of the functor.
-    void unbind(std::string const &name) { disp_->unbind(name); }
-
-    //! \brief Returns all binded names
+    void unbind(std::string const &name) {
+        disp_->unbind(name);
+    }
+	
+	//! \brief Returns all binded names
     //!
     //! This function returns a list of all names which functors are binded to
     //!
     //! \param name The name of the functor.
-    std::vector<std::string> names() const { return disp_->names(); }
-
+    std::vector<std::string> names() const {
+        return disp_->names();
+    }
+	
     //! \brief Sets the exception behavior in handlers. By default,
     //! handlers throwing will crash the server. If suppressing is on,
     //! the server will try to gather textual data and return it to
@@ -138,34 +134,32 @@ public:
     void stop();
 
     //! \brief Returns port
-    //! \note The port (only valid in TCP mode)
+    //! \note The port (只在TCP模式下有效)
     unsigned short port() const;
-
-    //! \brief Returns the Named Pipe name used by the server (only valid in Named Pipe mode)
-    //! \return Named Pipe name
+    
+    //! \brief 返回服务器使用的Named Pipe名称 (只在Named Pipe模式下有效)
+    //! \return Named Pipe名称
     std::string pipe_name() const;
-
-    //! \brief Gets the connection type of the server
-    //! \return Connection type (TCP or Named Pipe)
+    
+    //! \brief 获取服务器的连接类型
+    //! \return 连接类型(TCP或Named Pipe)
     connection_type get_connection_type() const;
 
     //! \brief Closes all sessions gracefully.
     void close_sessions();
 
     //! \brief Closes a specific session.
-    void close_session(std::shared_ptr<detail::server_session> const &s);
+    void close_session(std::shared_ptr<detail::server_session> const& s);
 
-    // Close Named Pipe session
-    template <typename SocketType>
-    void close_pipe_session(
-        std::shared_ptr<detail::server_pipe_session<SocketType>> const &s);
+    // 关闭Named Pipe会话
+    template<typename SocketType>
+    void close_pipe_session(std::shared_ptr<detail::server_pipe_session<SocketType>> const &s);
 
 private:
-    friend class StandardTCPServerTest; // For testing purposes
     RPCLIB_DECLARE_PIMPL()
     std::shared_ptr<detail::dispatcher> disp_;
 };
 
-} // namespace rpc
+} /* rpc */
 
 #endif /* end of include guard: SERVER_H_S0HB5KXY */
