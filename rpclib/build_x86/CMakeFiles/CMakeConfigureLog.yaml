@@ -24,7 +24,7 @@ events:
       The output was:
       0
       閫傜敤浜?.NET Framework MSBuild 鐗堟湰 17.13.15+18b3035f6
-      鐢熸垚鍚姩鏃堕棿涓?2025/6/4 13:52:19銆?
+      鐢熸垚鍚姩鏃堕棿涓?2025/6/4 14:36:19銆?
       
       鑺傜偣 1 涓婄殑椤圭洰鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\4.0.1\\CompilerIdC\\CompilerIdC.vcxproj鈥?榛樿鐩爣)銆?
       PrepareForBuild:
@@ -58,7 +58,7 @@ events:
           0 涓鍛?
           0 涓敊璇?
       
-      宸茬敤鏃堕棿 00:00:02.39
+      宸茬敤鏃堕棿 00:00:01.00
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -84,7 +84,7 @@ events:
       The output was:
       0
       閫傜敤浜?.NET Framework MSBuild 鐗堟湰 17.13.15+18b3035f6
-      鐢熸垚鍚姩鏃堕棿涓?2025/6/4 13:52:21銆?
+      鐢熸垚鍚姩鏃堕棿涓?2025/6/4 14:36:20銆?
       
       鑺傜偣 1 涓婄殑椤圭洰鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\4.0.1\\CompilerIdCXX\\CompilerIdCXX.vcxproj鈥?榛樿鐩爣)銆?
       PrepareForBuild:
@@ -118,7 +118,7 @@ events:
           0 涓鍛?
           0 涓敊璇?
       
-      宸茬敤鏃堕棿 00:00:01.00
+      宸茬敤鏃堕棿 00:00:00.96
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -137,8 +137,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-nih9zx"
-      binary: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-nih9zx"
+      source: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-5buc6j"
+      binary: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-5buc6j"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_EXE_LINKER_FLAGS: "/machine:X86"
@@ -146,45 +146,45 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-nih9zx'
+        Change Dir: 'E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-5buc6j'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_6dade.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_42d5a.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:VisualStudioVersion=17.0 /v:n
         閫傜敤浜?.NET Framework MSBuild 鐗堟湰 17.13.15+18b3035f6
-        鐢熸垚鍚姩鏃堕棿涓?2025/6/4 13:52:23銆?
+        鐢熸垚鍚姩鏃堕棿涓?2025/6/4 14:36:21銆?
         
-        鑺傜偣 1 涓婄殑椤圭洰鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-nih9zx\\cmTC_6dade.vcxproj鈥?榛樿鐩爣)銆?
+        鑺傜偣 1 涓婄殑椤圭洰鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-5buc6j\\cmTC_42d5a.vcxproj鈥?榛樿鐩爣)銆?
         PrepareForBuild:
-          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_6dade.dir\\Debug\\鈥濄€?
+          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_42d5a.dir\\Debug\\鈥濄€?
           宸插惎鐢ㄧ粨鏋勫寲杈撳嚭銆傜紪璇戝櫒璇婃柇鐨勬牸寮忚缃皢鍙嶆槧閿欒灞傛缁撴瀯銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/cpp/structured-output銆?
-          姝ｅ湪鍒涘缓鐩綍鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-nih9zx\\Debug\\鈥濄€?
-          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_6dade.dir\\Debug\\cmTC_6dade.tlog\\鈥濄€?
+          姝ｅ湪鍒涘缓鐩綍鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-5buc6j\\Debug\\鈥濄€?
+          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_42d5a.dir\\Debug\\cmTC_42d5a.tlog\\鈥濄€?
         InitializeBuildStatus:
-          姝ｅ湪鍒涘缓鈥渃mTC_6dade.dir\\Debug\\cmTC_6dade.tlog\\unsuccessfulbuild鈥濓紝鍥犱负宸叉寚瀹氣€淎lwaysCreate鈥濄€?
-          姝ｅ湪瀵光€渃mTC_6dade.dir\\Debug\\cmTC_6dade.tlog\\unsuccessfulbuild鈥濇墽琛?Touch 浠诲姟銆?
+          姝ｅ湪鍒涘缓鈥渃mTC_42d5a.dir\\Debug\\cmTC_42d5a.tlog\\unsuccessfulbuild鈥濓紝鍥犱负宸叉寚瀹氣€淎lwaysCreate鈥濄€?
+          姝ｅ湪瀵光€渃mTC_42d5a.dir\\Debug\\cmTC_42d5a.tlog\\unsuccessfulbuild鈥濇墽琛?Touch 浠诲姟銆?
         VcpkgTripletSelection:
           Using triplet "x86-windows" from "D:\\Environment\\vcpkg\\installed\\x86-windows\\"
           Using normalized configuration "Debug"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\CL.exe /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_6dade.dir\\Debug\\\\" /Fd"cmTC_6dade.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\CL.exe /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_42d5a.dir\\Debug\\\\" /Fd"cmTC_42d5a.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
           鐢ㄤ簬 x86 鐨?Microsoft (R) C/C++ 浼樺寲缂栬瘧鍣?19.43.34808 鐗?
           鐗堟潈鎵€鏈?C) Microsoft Corporation銆備繚鐣欐墍鏈夋潈鍒┿€?
-          cl /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_6dade.dir\\Debug\\\\" /Fd"cmTC_6dade.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
+          cl /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_42d5a.dir\\Debug\\\\" /Fd"cmTC_42d5a.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\link.exe /ERRORREPORT:QUEUE /OUT:"E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-nih9zx\\Debug\\cmTC_6dade.exe" /INCREMENTAL /ILK:"cmTC_6dade.dir\\Debug\\cmTC_6dade.ilk" /NOLOGO /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib" /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-nih9zx/Debug/cmTC_6dade.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-nih9zx/Debug/cmTC_6dade.lib" /MACHINE:X86  /machine:X86 cmTC_6dade.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_6dade.vcxproj -> E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-nih9zx\\Debug\\cmTC_6dade.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\link.exe /ERRORREPORT:QUEUE /OUT:"E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-5buc6j\\Debug\\cmTC_42d5a.exe" /INCREMENTAL /ILK:"cmTC_42d5a.dir\\Debug\\cmTC_42d5a.ilk" /NOLOGO /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib" /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-5buc6j/Debug/cmTC_42d5a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-5buc6j/Debug/cmTC_42d5a.lib" /MACHINE:X86  /machine:X86 cmTC_42d5a.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_42d5a.vcxproj -> E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-5buc6j\\Debug\\cmTC_42d5a.exe
         AppLocalFromInstalled:
-          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "D:\\Environment\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-nih9zx\\Debug\\cmTC_6dade.exe" "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\bin" "cmTC_6dade.dir\\Debug\\cmTC_6dade.tlog\\cmTC_6dade.write.1u.tlog" "cmTC_6dade.dir\\Debug\\vcpkg.applocal.log"
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "D:\\Environment\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-5buc6j\\Debug\\cmTC_42d5a.exe" "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\bin" "cmTC_42d5a.dir\\Debug\\cmTC_42d5a.tlog\\cmTC_42d5a.write.1u.tlog" "cmTC_42d5a.dir\\Debug\\vcpkg.applocal.log"
         FinalizeBuildStatus:
-          姝ｅ湪鍒犻櫎鏂囦欢鈥渃mTC_6dade.dir\\Debug\\cmTC_6dade.tlog\\unsuccessfulbuild鈥濄€?
-          姝ｅ湪瀵光€渃mTC_6dade.dir\\Debug\\cmTC_6dade.tlog\\cmTC_6dade.lastbuildstate鈥濇墽琛?Touch 浠诲姟銆?
-        宸插畬鎴愮敓鎴愰」鐩€淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-nih9zx\\cmTC_6dade.vcxproj鈥?榛樿鐩爣)鐨勬搷浣溿€?
+          姝ｅ湪鍒犻櫎鏂囦欢鈥渃mTC_42d5a.dir\\Debug\\cmTC_42d5a.tlog\\unsuccessfulbuild鈥濄€?
+          姝ｅ湪瀵光€渃mTC_42d5a.dir\\Debug\\cmTC_42d5a.tlog\\cmTC_42d5a.lastbuildstate鈥濇墽琛?Touch 浠诲姟銆?
+        宸插畬鎴愮敓鎴愰」鐩€淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-5buc6j\\cmTC_42d5a.vcxproj鈥?榛樿鐩爣)鐨勬搷浣溿€?
         
         宸叉垚鍔熺敓鎴愩€?
             0 涓鍛?
             0 涓敊璇?
         
-        宸茬敤鏃堕棿 00:00:01.00
+        宸茬敤鏃堕棿 00:00:00.95
         
       exitCode: 0
   -
@@ -224,8 +224,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-yt2qg5"
-      binary: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-yt2qg5"
+      source: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-2p8qi3"
+      binary: "E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-2p8qi3"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /W3 /GR /EHsc"
       CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
@@ -234,45 +234,45 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-yt2qg5'
+        Change Dir: 'E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-2p8qi3'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_b0481.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_bd77e.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:VisualStudioVersion=17.0 /v:n
         閫傜敤浜?.NET Framework MSBuild 鐗堟湰 17.13.15+18b3035f6
-        鐢熸垚鍚姩鏃堕棿涓?2025/6/4 13:52:24銆?
+        鐢熸垚鍚姩鏃堕棿涓?2025/6/4 14:36:23銆?
         
-        鑺傜偣 1 涓婄殑椤圭洰鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-yt2qg5\\cmTC_b0481.vcxproj鈥?榛樿鐩爣)銆?
+        鑺傜偣 1 涓婄殑椤圭洰鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-2p8qi3\\cmTC_bd77e.vcxproj鈥?榛樿鐩爣)銆?
         PrepareForBuild:
-          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_b0481.dir\\Debug\\鈥濄€?
+          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_bd77e.dir\\Debug\\鈥濄€?
           宸插惎鐢ㄧ粨鏋勫寲杈撳嚭銆傜紪璇戝櫒璇婃柇鐨勬牸寮忚缃皢鍙嶆槧閿欒灞傛缁撴瀯銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/cpp/structured-output銆?
-          姝ｅ湪鍒涘缓鐩綍鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-yt2qg5\\Debug\\鈥濄€?
-          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_b0481.dir\\Debug\\cmTC_b0481.tlog\\鈥濄€?
+          姝ｅ湪鍒涘缓鐩綍鈥淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-2p8qi3\\Debug\\鈥濄€?
+          姝ｅ湪鍒涘缓鐩綍鈥渃mTC_bd77e.dir\\Debug\\cmTC_bd77e.tlog\\鈥濄€?
         InitializeBuildStatus:
-          姝ｅ湪鍒涘缓鈥渃mTC_b0481.dir\\Debug\\cmTC_b0481.tlog\\unsuccessfulbuild鈥濓紝鍥犱负宸叉寚瀹氣€淎lwaysCreate鈥濄€?
-          姝ｅ湪瀵光€渃mTC_b0481.dir\\Debug\\cmTC_b0481.tlog\\unsuccessfulbuild鈥濇墽琛?Touch 浠诲姟銆?
+          姝ｅ湪鍒涘缓鈥渃mTC_bd77e.dir\\Debug\\cmTC_bd77e.tlog\\unsuccessfulbuild鈥濓紝鍥犱负宸叉寚瀹氣€淎lwaysCreate鈥濄€?
+          姝ｅ湪瀵光€渃mTC_bd77e.dir\\Debug\\cmTC_bd77e.tlog\\unsuccessfulbuild鈥濇墽琛?Touch 浠诲姟銆?
         VcpkgTripletSelection:
           Using triplet "x86-windows" from "D:\\Environment\\vcpkg\\installed\\x86-windows\\"
           Using normalized configuration "Debug"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\CL.exe /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_b0481.dir\\Debug\\\\" /Fd"cmTC_b0481.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\CL.exe /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_bd77e.dir\\Debug\\\\" /Fd"cmTC_bd77e.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
           鐢ㄤ簬 x86 鐨?Microsoft (R) C/C++ 浼樺寲缂栬瘧鍣?19.43.34808 鐗?
           鐗堟潈鎵€鏈?C) Microsoft Corporation銆備繚鐣欐墍鏈夋潈鍒┿€?
-          cl /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_b0481.dir\\Debug\\\\" /Fd"cmTC_b0481.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /I"D:\\Environment\\vcpkg\\installed\\x86-windows\\include" /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_bd77e.dir\\Debug\\\\" /Fd"cmTC_bd77e.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /analyze- /errorReport:queue "C:\\Users\\LeiGod\\scoop\\apps\\cmake\\current\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\link.exe /ERRORREPORT:QUEUE /OUT:"E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-yt2qg5\\Debug\\cmTC_b0481.exe" /INCREMENTAL /ILK:"cmTC_b0481.dir\\Debug\\cmTC_b0481.ilk" /NOLOGO /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib" /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-yt2qg5/Debug/cmTC_b0481.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-yt2qg5/Debug/cmTC_b0481.lib" /MACHINE:X86  /machine:X86 cmTC_b0481.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_b0481.vcxproj -> E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-yt2qg5\\Debug\\cmTC_b0481.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x86\\link.exe /ERRORREPORT:QUEUE /OUT:"E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-2p8qi3\\Debug\\cmTC_bd77e.exe" /INCREMENTAL /ILK:"cmTC_bd77e.dir\\Debug\\cmTC_bd77e.ilk" /NOLOGO /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib" /LIBPATH:"D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-2p8qi3/Debug/cmTC_bd77e.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:/modifyRPC/rpclib/build_x86/CMakeFiles/CMakeScratch/TryCompile-2p8qi3/Debug/cmTC_bd77e.lib" /MACHINE:X86  /machine:X86 cmTC_bd77e.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_bd77e.vcxproj -> E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-2p8qi3\\Debug\\cmTC_bd77e.exe
         AppLocalFromInstalled:
-          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "D:\\Environment\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-yt2qg5\\Debug\\cmTC_b0481.exe" "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\bin" "cmTC_b0481.dir\\Debug\\cmTC_b0481.tlog\\cmTC_b0481.write.1u.tlog" "cmTC_b0481.dir\\Debug\\vcpkg.applocal.log"
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "D:\\Environment\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "E:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-2p8qi3\\Debug\\cmTC_bd77e.exe" "D:\\Environment\\vcpkg\\installed\\x86-windows\\debug\\bin" "cmTC_bd77e.dir\\Debug\\cmTC_bd77e.tlog\\cmTC_bd77e.write.1u.tlog" "cmTC_bd77e.dir\\Debug\\vcpkg.applocal.log"
         FinalizeBuildStatus:
-          姝ｅ湪鍒犻櫎鏂囦欢鈥渃mTC_b0481.dir\\Debug\\cmTC_b0481.tlog\\unsuccessfulbuild鈥濄€?
-          姝ｅ湪瀵光€渃mTC_b0481.dir\\Debug\\cmTC_b0481.tlog\\cmTC_b0481.lastbuildstate鈥濇墽琛?Touch 浠诲姟銆?
-        宸插畬鎴愮敓鎴愰」鐩€淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-yt2qg5\\cmTC_b0481.vcxproj鈥?榛樿鐩爣)鐨勬搷浣溿€?
+          姝ｅ湪鍒犻櫎鏂囦欢鈥渃mTC_bd77e.dir\\Debug\\cmTC_bd77e.tlog\\unsuccessfulbuild鈥濄€?
+          姝ｅ湪瀵光€渃mTC_bd77e.dir\\Debug\\cmTC_bd77e.tlog\\cmTC_bd77e.lastbuildstate鈥濇墽琛?Touch 浠诲姟銆?
+        宸插畬鎴愮敓鎴愰」鐩€淓:\\modifyRPC\\rpclib\\build_x86\\CMakeFiles\\CMakeScratch\\TryCompile-2p8qi3\\cmTC_bd77e.vcxproj鈥?榛樿鐩爣)鐨勬搷浣溿€?
         
         宸叉垚鍔熺敓鎴愩€?
             0 涓鍛?
             0 涓敊璇?
         
-        宸茬敤鏃堕棿 00:00:01.07
+        宸茬敤鏃堕棿 00:00:00.95
         
       exitCode: 0
   -

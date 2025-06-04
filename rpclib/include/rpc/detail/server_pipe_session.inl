@@ -205,73 +205,55 @@ void server_pipe_session<SocketType>::process_message(RPCLIB_MSGPACK::object_han
 }
 
 #ifdef _WIN32
+// Fixed: Use async_read for framing, not async_read_some
 template<>
 void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read_message_mode() {
-    LOG_INFO("server_pipe_session: Enter NEW framing/packet handling do_read_message_mode()");
-    std::cout << "[server_pipe_session::do_read_message_mode] NEW: Starting async_read_some" << std::endl;
+    LOG_INFO("[server_pipe_session::do_read_message_mode] FRAMING: async_read length + payload");
+    std::cout << "[server_pipe_session::do_read_message_mode] NEW: Starting async_read (framing mode)" << std::endl;
 
     auto self = std::static_pointer_cast<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>>(
         async_writer<RPCLIB_ASIO::windows::stream_handle>::shared_from_this());
 
-    if (!this->framing_buffer_) {
-        this->framing_buffer_ = std::make_shared<std::vector<char>>();
-    }
-
-    this->socket().async_read_some(
-        RPCLIB_ASIO::buffer(read_buffer_.data(), read_buffer_.size()),
-        read_strand_.wrap([this, self](std::error_code ec, std::size_t bytes_transferred) {
-            if (this->is_closed()) {
-                std::cout << "[server_pipe_session::do_read_message_mode] Session closed" << std::endl;
-                return;
-            }
-            if (ec) {
-                std::cout << "[server_pipe_session::do_read_message_mode] Error: " << ec.message() << std::endl;
+    // Step 1: Read 4-byte length header
+    auto lenbuf = std::make_shared<std::vector<char>>(4);
+    RPCLIB_ASIO::async_read(
+        this->socket(),
+        RPCLIB_ASIO::buffer(*lenbuf),
+        read_strand_.wrap([this, self, lenbuf](std::error_code ec, std::size_t n) {
+            if (this->is_closed()) return;
+            if (ec || n != 4) {
+                LOG_ERROR("async_read (length) failed: {} bytes, ec={}: {}", n, ec.value(), ec.message());
+                std::cout << "[server_pipe_session::do_read_message_mode] async_read length failed: " << ec.message() << std::endl;
                 this->close();
                 return;
             }
-            if (bytes_transferred == 0) {
-                std::cout << "[server_pipe_session::do_read_message_mode] Zero bytes, retrying" << std::endl;
-                do_read_message_mode();
+            uint32_t msglen = 0;
+            memcpy(&msglen, lenbuf->data(), 4);
+            std::cout << "[server_pipe_session::do_read_message_mode] Got frame length: " << msglen << std::endl;
+            if (msglen == 0 || msglen > (16 * 1024 * 1024)) {
+                LOG_ERROR("Invalid message length: {}", msglen);
+                this->close();
                 return;
             }
-
-            std::cout << "[server_pipe_session::do_read_message_mode] Read " << bytes_transferred << " bytes" << std::endl;
-
-            // Append new data to framing buffer
-            framing_buffer_->insert(framing_buffer_->end(), 
-                read_buffer_.data(), read_buffer_.data() + bytes_transferred);
-            
-            std::cout << "[server_pipe_session::do_read_message_mode] Framing buffer size now: " 
-                << framing_buffer_->size() << std::endl;
-
-            // Process complete frames
-            while (framing_buffer_->size() >= 4) {
-                uint32_t payload_len = 0;
-                memcpy(&payload_len, framing_buffer_->data(), 4);
-
-                std::cout << "[server_pipe_session::do_read_message_mode] Got frame length: " 
-                    << payload_len << std::endl;
-
-                if (payload_len == 0 || payload_len > (16 * 1024 * 1024)) {
-                    std::cout << "[server_pipe_session::do_read_message_mode] Invalid payload length" << std::endl;
-                    this->close();
-                    return;
-                }
-
-                if (framing_buffer_->size() < 4 + payload_len) {
-                    std::cout << "[server_pipe_session::do_read_message_mode] Need more data for complete frame" 
-                        << std::endl;
-                    break;
-                }
-
-                std::cout << "[server_pipe_session::do_read_message_mode] Processing complete frame" << std::endl;
-                process_raw_message(framing_buffer_->data() + 4, payload_len);
-                framing_buffer_->erase(framing_buffer_->begin(), 
-                    framing_buffer_->begin() + 4 + payload_len);
-            }
-
-            std::cout << "[server_pipe_session::do_read_message_mode] Continuing read loop" << std::endl;
-            do_read_message_mode();
+            // Step 2: Read payload
+            auto payload = std::make_shared<std::vector<char>>(msglen);
+            RPCLIB_ASIO::async_read(
+                this->socket(),
+                RPCLIB_ASIO::buffer(*payload),
+                read_strand_.wrap([this, self, payload, msglen](std::error_code ec2, std::size_t n2) {
+                    if (this->is_closed()) return;
+                    if (ec2 || n2 != msglen) {
+                        LOG_ERROR("async_read (payload) failed: {} bytes, ec={}: {}", n2, ec2.value(), ec2.message());
+                        std::cout << "[server_pipe_session::do_read_message_mode] async_read payload failed: " << ec2.message() << std::endl;
+                        this->close();
+                        return;
+                    }
+                    std::cout << "[server_pipe_session::do_read_message_mode] Processing complete frame of size: " << msglen << std::endl;
+                    process_raw_message(payload->data(), msglen);
+                    if (!this->is_closed())
+                        do_read_message_mode();
+                })
+            );
         })
     );
 }

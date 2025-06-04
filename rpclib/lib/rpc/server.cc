@@ -189,7 +189,7 @@ struct server::impl {
                 std::cerr << "[server.cc] Invalid pipe handle when trying to accept connection" << std::endl;
                 return;
             }
-            // Use async/overlapped approach for ConnectNamedPipe
+            // Use overlapped (async) approach for ConnectNamedPipe
             io_.post([this]() {
                 try {
                     LOG_INFO("Waiting for client connection on pipe: {}", pipe_name_);
@@ -201,6 +201,7 @@ struct server::impl {
                     BOOL connected = ConnectNamedPipe(pipe_handle_, &ov);
                     DWORD last_error = GetLastError();
                     if (!connected && last_error == ERROR_IO_PENDING) {
+                        // Wait for client to connect asynchronously
                         DWORD wait_result = WaitForSingleObject(hEvent, INFINITE);
                         if (wait_result == WAIT_OBJECT_0) {
                             last_error = 0;
@@ -213,6 +214,19 @@ struct server::impl {
                         LOG_INFO("Client connected to Windows Named Pipe");
                         std::cout << "[server.cc] Client connected to pipe" << std::endl;
                         HANDLE session_handle = pipe_handle_;
+
+                        // Create next pipe instance immediately for the next connection
+                        pipe_handle_ = CreateNamedPipeA(
+                            full_pipe_name_.c_str(),
+                            PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // No FILE_FLAG_FIRST_PIPE_INSTANCE here!
+                            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                            PIPE_UNLIMITED_INSTANCES,
+                            8192, 8192, 0, NULL);
+                        if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                            DWORD error = GetLastError();
+                            LOG_ERROR("Failed to create new pipe instance: {}", error);
+                            std::cout << "[server.cc] Failed to create new pipe instance: error=" << error << std::endl;
+                        }
 
                         DWORD mode = PIPE_READMODE_MESSAGE;
                         if (!SetNamedPipeHandleState(session_handle, &mode, NULL, NULL)) {
@@ -246,18 +260,6 @@ struct server::impl {
                         } catch (const std::exception& ex) {
                             LOG_ERROR("Exception creating pipe session: {}", ex.what());
                             std::cerr << "[server.cc] Exception creating pipe session: " << ex.what() << std::endl;
-                        }
-                        // Now create the next pipe instance for the next connection, WITHOUT FILE_FLAG_FIRST_PIPE_INSTANCE!
-                        pipe_handle_ = CreateNamedPipeA(
-                            full_pipe_name_.c_str(),
-                            PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // No FILE_FLAG_FIRST_PIPE_INSTANCE here!
-                            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-                            PIPE_UNLIMITED_INSTANCES,
-                            8192, 8192, 0, NULL);
-                        if (pipe_handle_ == INVALID_HANDLE_VALUE) {
-                            DWORD error = GetLastError();
-                            LOG_ERROR("Failed to create new pipe instance: {}", error);
-                            std::cout << "[server.cc] Failed to create new pipe instance: error=" << error << std::endl;
                         }
                         if (!this_server().stopping())
                             start_accept();
