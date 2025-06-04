@@ -17,6 +17,10 @@
 #include "rpc/config.h"
 #include "rpc/msgpack.hpp"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace rpc {
 namespace detail {
 
@@ -30,8 +34,8 @@ struct socket_traits {
     }
 };
 
-// Windows platform stream_handle specialization
 #ifdef _WIN32
+// Windows platform stream_handle specialization
 template <>
 struct socket_traits<RPCLIB_ASIO::windows::stream_handle> {
     static void close_socket(RPCLIB_ASIO::windows::stream_handle& socket, std::error_code& ec) {
@@ -39,51 +43,51 @@ struct socket_traits<RPCLIB_ASIO::windows::stream_handle> {
         socket.close(ec);
     }
 };
+// Synchronous HANDLE specialization (for Windows Named Pipe, sync mode)
+template <>
+struct socket_traits<HANDLE> {
+    static void close_socket(HANDLE& handle, std::error_code& /*ec*/) {
+        if (handle != INVALID_HANDLE_VALUE) {
+            CloseHandle(handle);
+            handle = INVALID_HANDLE_VALUE;
+        }
+    }
+};
 #endif
 
 // Helper function for writing to different socket types
 template <typename T>
 inline void write_helper(T &s, RPCLIB_MSGPACK::sbuffer &buf, bool /* message_mode */ = false) {
-    // Standard async_write for most socket types
+    // Standard async_write for most socket types (TCP/Unix)
     RPCLIB_ASIO::async_write(
         s, RPCLIB_ASIO::buffer(buf.data(), buf.size()),
         [](std::error_code, std::size_t) {});
 }
 
 #ifdef _WIN32
-// Specialized write helper for Windows Named Pipes with message mode support and framing
-template <>
-inline void write_helper<RPCLIB_ASIO::windows::stream_handle>(
-    RPCLIB_ASIO::windows::stream_handle &s, 
-    RPCLIB_MSGPACK::sbuffer &buf, 
-    bool message_mode) {
-        
+// Synchronous write helper for Windows Named Pipe (HANDLE), replaces async_write/async_write_some
+inline void write_helper(HANDLE hPipe, RPCLIB_MSGPACK::sbuffer &buf, bool message_mode = false) {
     if (message_mode) {
-        // For message mode, add a 4-byte length prefix before the payload
         uint32_t len = static_cast<uint32_t>(buf.size());
-        std::vector<char> framed;
-        framed.resize(4 + buf.size());
-        memcpy(framed.data(), &len, 4); // Little-endian
-        memcpy(framed.data() + 4, buf.data(), buf.size());
-
-        // --- Log framing header and part of content ---
-        std::cout << "[async_writer] [framing write] Length prefix: " << len << ", total bytes: " << framed.size() << std::endl;
-        std::cout << "[async_writer] [framing write] Content: ";
-        std::cout << std::string(framed.data() + 4, framed.size() - 4) << std::endl;  // Print the content as string
-
-        try {
-            // Use synchronous write for Windows Named Pipe in message mode
-            RPCLIB_ASIO::write(
-                s, RPCLIB_ASIO::buffer(framed.data(), framed.size()));
+        DWORD written = 0;
+        // Write framing header (4 bytes)
+        if (!WriteFile(hPipe, &len, 4, &written, NULL) || written != 4) {
+            std::cerr << "[sync_writer] Failed to write framing header, error: " << GetLastError() << std::endl;
+            throw std::runtime_error("Failed to write framing header.");
         }
-        catch (const std::exception&) {
-            // Handle write errors - log if needed
+        // Write payload
+        if (!WriteFile(hPipe, buf.data(), buf.size(), &written, NULL) || written != buf.size()) {
+            std::cerr << "[sync_writer] Failed to write payload, error: " << GetLastError() << std::endl;
+            throw std::runtime_error("Failed to write payload.");
         }
+        std::cout << "[sync_writer] Wrote " << written << " bytes payload, total " << (4 + written) << " bytes (len=" << len << ")" << std::endl;
     } else {
-        // Standard byte-oriented async write
-        RPCLIB_ASIO::async_write(
-            s, RPCLIB_ASIO::buffer(buf.data(), buf.size()),
-            [](std::error_code, std::size_t) {});
+        DWORD written = 0;
+        if (!WriteFile(hPipe, buf.data(), buf.size(), &written, NULL) || written != buf.size()) {
+            std::cerr << "[sync_writer] Failed to write raw buffer, error: " << GetLastError() << std::endl;
+            throw std::runtime_error("Failed to write raw buffer.");
+        }
+        std::cout << "[sync_writer] Wrote raw buffer: " << written << " bytes" << std::endl;
     }
 }
 #endif
@@ -100,7 +104,7 @@ public:
           is_closed_(false),
           message_mode_(false) {
 #ifdef _WIN32
-        // 强制在Windows下默认开启message_mode，确保双方framing一致
+        // Enable message mode by default for Windows
         message_mode_ = true;
 #endif
     }
@@ -152,9 +156,8 @@ template <typename SocketType>
 void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
     std::cout << "[async_writer] write() called, message_mode_=" << message_mode_ << ", closed=" << is_closed_ << std::endl;
 #ifdef _WIN32
-    // Windows Named Pipe: only allow synchronous write, do not use strand, do not use async
-    if (std::is_same<SocketType, RPCLIB_ASIO::windows::stream_handle>::value && message_mode_) {
-        // Directly write with framing, do not queue
+    // If this is a Windows Named Pipe HANDLE, use synchronous WriteFile
+    if (std::is_same<SocketType, HANDLE>::value && message_mode_) {
         write_helper(socket_, data, message_mode_);
         return;
     }
@@ -281,6 +284,57 @@ template <typename SocketType>
 bool async_writer<SocketType>::is_closed() const {
     return is_closed_;
 }
+
+#ifdef _WIN32
+// Specialization for HANDLE (sync pipe)
+template <>
+class async_writer<HANDLE> : public std::enable_shared_from_this<async_writer<HANDLE>> {
+public:
+    async_writer(RPCLIB_ASIO::io_service * /*io*/, HANDLE handle)
+        : handle_(handle), is_closed_(false), message_mode_(true) {}
+
+    void write(RPCLIB_MSGPACK::sbuffer &&data) {
+        ::rpc::detail::write_helper(handle_, data, message_mode_);
+    }
+    HANDLE &socket() { return handle_; }
+    HANDLE &stream() { return handle_; }
+    // Dummy strand (not used)
+    RPCLIB_ASIO::strand &write_strand() { throw std::logic_error("Not implemented in sync HANDLE async_writer"); }
+    void close() {
+        if (!is_closed_) {
+            std::error_code ec;
+            socket_traits<HANDLE>::close_socket(handle_, ec);
+            is_closed_ = true;
+        }
+    }
+    bool is_closed() const { return is_closed_; }
+    void set_message_mode(bool enabled) { message_mode_ = enabled; }
+    bool get_message_mode() const { return message_mode_; }
+
+    // Synchronous version: read one framed message ([4 bytes length][data]), returns buffer with message
+    static std::vector<uint8_t> read_framed(HANDLE &hPipe) {
+        uint32_t len = 0;
+        DWORD read = 0;
+        BOOL ok = ReadFile(hPipe, &len, 4, &read, NULL);
+        if (!ok || read != 4) return {};
+        if (len == 0) return {};
+        std::vector<uint8_t> data(len);
+        ok = ReadFile(hPipe, data.data(), len, &read, NULL);
+        if (!ok || read != len) return {};
+        return data;
+    }
+
+protected:
+    template <typename T>
+    std::shared_ptr<T> shared_from_base() {
+        return std::static_pointer_cast<T>(this->shared_from_this());
+    }
+private:
+    HANDLE handle_;
+    bool is_closed_;
+    bool message_mode_;
+};
+#endif
 
 } /* detail */
 } /* rpc */

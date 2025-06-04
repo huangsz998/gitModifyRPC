@@ -57,6 +57,9 @@
     <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\client_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\compatibility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -127,6 +130,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\detail\write_helper_fwd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="E:\modifyRPC\rpclib\include\rpc\dispatcher.h">
