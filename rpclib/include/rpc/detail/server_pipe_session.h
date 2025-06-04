@@ -38,6 +38,7 @@ public:
     // Set message mode flag for Windows Named Pipes and propagate to async_writer
     void set_message_mode(bool enabled) {
         message_mode_ = enabled;
+        std::cout << "[server_pipe_session::set_message_mode] set to " << enabled << std::endl;
         async_writer<SocketType>::set_message_mode(enabled); // propagate to base
     }
 
@@ -62,6 +63,9 @@ private:
     std::vector<char> read_buffer_; // Buffer for message reading
     bool message_mode_; // Flag for message mode
     const bool suppress_exceptions_;
+#ifdef _WIN32
+    std::shared_ptr<std::vector<char>> framing_buffer_; // Sticky packet buffer for Windows
+#endif
     RPCLIB_CREATE_LOG_CHANNEL(pipe_session)
 };
 

@@ -10,6 +10,7 @@
 #include <mutex>
 #include <thread>
 #include <unordered_map>
+#include <memory>
 
 #include "asio.hpp"
 #include "format.h"
@@ -60,8 +61,10 @@ namespace rpc {
                   conn_type_(conn_type::TCP),
                   writer_tcp_(std::make_shared<detail::async_writer<RPCLIB_ASIO::ip::tcp::socket>>( &io_, RPCLIB_ASIO::ip::tcp::socket(io_))),
                   timeout_(nonstd::nullopt),
-                  connection_ec_(nonstd::nullopt) {
+                  connection_ec_(nonstd::nullopt),
+                  work_guard_(nullptr) {
             pac_.reserve_buffer(default_buffer_size);
+            work_guard_.reset(new RPCLIB_ASIO::io_service::work(io_));
         }
 
         impl(client *parent, std::string const &pipe_name)
@@ -76,7 +79,8 @@ namespace rpc {
                   state_(client::connection_state::initial),
                   conn_type_(conn_type::NAMED_PIPE),
                   timeout_(nonstd::nullopt),
-                  connection_ec_(nonstd::nullopt) {
+                  connection_ec_(nonstd::nullopt),
+                  work_guard_(nullptr) {
             pac_.reserve_buffer(default_buffer_size);
             read_buffer_.resize(message_buffer_size);
 #ifdef _WIN32
@@ -87,6 +91,7 @@ namespace rpc {
 #else
             pipe_socket_unix_ = detail::make_unique<local::stream_protocol::socket>(io_);
 #endif
+            work_guard_.reset(new RPCLIB_ASIO::io_service::work(io_));
         }
 
         void do_connect(tcp::resolver::iterator endpoint_iterator) {
@@ -128,6 +133,7 @@ namespace rpc {
                 int max_retries = 10;
                 for (int i = 0; i < max_retries; i++) {
                     LOG_INFO("Connection attempt {} of {}", i+1, max_retries);
+                    // Wait for server to create the instance, otherwise CreateFile will fail
                     pipe_handle_ = CreateFileA(
                         full_pipe_name_.c_str(),
                         GENERIC_READ | GENERIC_WRITE,
@@ -176,6 +182,7 @@ namespace rpc {
                     writer_pipe_win_ = std::make_shared<detail::async_writer<RPCLIB_ASIO::windows::stream_handle>>(
                         &io_, RPCLIB_ASIO::windows::stream_handle(io_, pipe_handle_));
                     writer_pipe_win_->set_message_mode(true);
+                    // 交给stream_handle后，不要再 CloseHandle
                     pipe_handle_ = INVALID_HANDLE_VALUE;
                     std::unique_lock<std::mutex> lock(mut_connection_finished_);
                     LOG_INFO("Client connected to Windows Named Pipe: {}", full_pipe_name_);
@@ -223,18 +230,44 @@ namespace rpc {
         }
 
 #ifdef _WIN32
-        // New: Message mode framing read for Windows Named Pipe
+        // Message mode framing read for Windows Named Pipe
         void do_read_pipe_win_message_framing() {
-            auto self = this;
-            auto& stream = writer_pipe_win_->stream();
-            auto read_loop = [this, self, &stream]() {
-                while (state_ == client::connection_state::connected) {
-                    try {
-                        auto frame = detail::async_writer<RPCLIB_ASIO::windows::stream_handle>::read_framed(stream);
-                        if (!frame.empty()) {
-                            pac_.reserve_buffer(frame.size());
-                            memcpy(pac_.buffer(), frame.data(), frame.size());
-                            pac_.buffer_consumed(frame.size());
+            // framing buffer for sticky-packet processing
+            auto framing_buffer = std::make_shared<std::vector<char>>();
+            auto read_buffer = std::make_shared<std::vector<char>>(message_buffer_size);
+
+            // Use std::function to allow recursive lambda without copying non-copyable stream_handle
+            std::function<void()> do_read;
+            do_read = [this, framing_buffer, read_buffer, &do_read]() {
+                if (!writer_pipe_win_) return;
+                auto& stream = writer_pipe_win_->stream();
+                stream.async_read_some(
+                    RPCLIB_ASIO::buffer(read_buffer->data(), read_buffer->size()),
+                    [this, framing_buffer, read_buffer, &do_read](std::error_code ec, std::size_t bytes_transferred) {
+                        if (state_ != client::connection_state::connected) return;
+                        if (ec) {
+                            LOG_ERROR("Named Pipe client read error: {}", ec.message());
+                            state_ = client::connection_state::disconnected;
+                            return;
+                        }
+                        if (bytes_transferred == 0) {
+                            LOG_WARN("Zero bytes read from pipe, retrying...");
+                            do_read();
+                            return;
+                        }
+                        framing_buffer->insert(framing_buffer->end(), read_buffer->data(), read_buffer->data() + bytes_transferred);
+                        while (framing_buffer->size() >= 4) {
+                            uint32_t msglen = 0;
+                            memcpy(&msglen, framing_buffer->data(), 4);
+                            if (msglen == 0 || msglen > (16 * 1024 * 1024)) {
+                                LOG_ERROR("Invalid frame size: {}", msglen);
+                                state_ = client::connection_state::disconnected;
+                                return;
+                            }
+                            if (framing_buffer->size() < 4 + msglen) break;
+                            pac_.reserve_buffer(msglen);
+                            memcpy(pac_.buffer(), framing_buffer->data() + 4, msglen);
+                            pac_.buffer_consumed(msglen);
                             RPCLIB_MSGPACK::unpacked result;
                             while (pac_.next(result)) {
                                 auto r = response(std::move(result));
@@ -260,20 +293,13 @@ namespace rpc {
                                     LOG_WARN("Received response for unknown call id: {}", id);
                                 }
                             }
-                        } else {
-                            LOG_WARN("Received empty framed message from pipe, closing connection.");
-                            state_ = client::connection_state::disconnected;
-                            break;
+                            framing_buffer->erase(framing_buffer->begin(), framing_buffer->begin() + 4 + msglen);
                         }
-                    } catch (const std::exception& e) {
-                        LOG_ERROR("Framing read error in pipe: {}", e.what());
-                        state_ = client::connection_state::disconnected;
-                        break;
+                        do_read();
                     }
-                }
+                );
             };
-            // Start the read loop in a background thread
-            std::thread(read_loop).detach();
+            do_read();
         }
 #endif
 
@@ -388,6 +414,7 @@ namespace rpc {
         nonstd::optional<int64_t> timeout_;
         nonstd::optional<std::error_code> connection_ec_;
         RPCLIB_CREATE_LOG_CHANNEL(client)
+        std::unique_ptr<RPCLIB_ASIO::io_service::work> work_guard_;
     };
 
     client::client(std::string const &addr, uint16_t port)
@@ -408,7 +435,6 @@ namespace rpc {
         : pimpl(new client::impl(this, pipe_name)) {
     set_timeout(15000);
 
-    // 1. 先启动 io_service 的 run 线程
     std::thread io_thread([this]() {
         try {
             RPCLIB_CREATE_LOG_CHANNEL(client)
@@ -457,7 +483,6 @@ namespace rpc {
     } catch (const std::exception &ex) {
         LOG_ERROR("Failed to initialize client: {}", ex.what());
         std::cerr << "Failed to initialize client: " << ex.what() << std::endl;
-        // io_thread_ 已经被启动，此处不能再 throw，或可选择设置状态，主流程抛异常
         throw;
     }
 }
@@ -602,10 +627,10 @@ void client::post(RPCLIB_MSGPACK::sbuffer *buffer) {
                                    *get_timeout(), func_name));
     }
     client::~client() {
+        pimpl->work_guard_.reset();
         pimpl->io_.stop();
         pimpl->io_thread_.join();
 #ifdef _WIN32
-        // Do not close pipe_handle_ here; stream_handle manages it after move
         pimpl->pipe_handle_ = INVALID_HANDLE_VALUE;
 #endif
     }

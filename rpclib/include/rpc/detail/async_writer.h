@@ -68,13 +68,11 @@ inline void write_helper<RPCLIB_ASIO::windows::stream_handle>(
 
         // --- Log framing header and part of content ---
         std::cout << "[async_writer] [framing write] Length prefix: " << len << ", total bytes: " << framed.size() << std::endl;
-        std::cout << "[async_writer] [framing write] First 16 bytes (hex): ";
-        for (size_t i = 0; i < std::min(size_t(16), framed.size()); ++i) {
-            printf("%02x ", (unsigned char)framed[i]);
-        }
-        std::cout << std::endl;
+        std::cout << "[async_writer] [framing write] Content: ";
+        std::cout << std::string(framed.data() + 4, framed.size() - 4) << std::endl;  // Print the content as string
 
         try {
+            // Use synchronous write for Windows Named Pipe in message mode
             RPCLIB_ASIO::write(
                 s, RPCLIB_ASIO::buffer(framed.data(), framed.size()));
         }
@@ -100,7 +98,12 @@ public:
           is_writing_(false),
           exit_(false),
           is_closed_(false),
-          message_mode_(false) {}
+          message_mode_(false) {
+#ifdef _WIN32
+        // 强制在Windows下默认开启message_mode，确保双方framing一致
+        message_mode_ = true;
+#endif
+    }
 
     void write(RPCLIB_MSGPACK::sbuffer &&data);
     SocketType &socket();

@@ -1,27 +1,26 @@
 #pragma once
 
 #include "rpc/detail/server_pipe_session.h"
-
 #include "rpc/config.h"
 #include "rpc/server.h"
 #include "rpc/this_handler.h"
 #include "rpc/this_server.h"
 #include "rpc/this_session.h"
-
 #include "rpc/detail/log.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 namespace rpc {
 
-// External declaration for pipe debugging flag
 extern bool enable_pipe_debug;
 extern bool enable_message_tracking;
 
 namespace detail {
 
-static constexpr std::size_t pipe_default_buffer_size =
+static constexpr std::size_t pipe_default_buffer_size = 
     rpc::constants::DEFAULT_BUFFER_SIZE;
-
-// Larger buffer size for message mode
 static constexpr std::size_t pipe_message_buffer_size = 65536;
 
 template<typename SocketType>
@@ -36,41 +35,62 @@ server_pipe_session<SocketType>::server_pipe_session(
       disp_(disp),
       pac_(),
       message_mode_(false),
-      suppress_exceptions_(suppress_exceptions) {
+      suppress_exceptions_(suppress_exceptions)
+#ifdef _WIN32
+      ,framing_buffer_(nullptr)
+#endif
+{
     LOG_INFO("server_pipe_session: constructor called");
+    std::cout << "[server_pipe_session::ctor] constructed" << std::endl;
+    
     pac_.reserve_buffer(pipe_default_buffer_size);
     read_buffer_.resize(pipe_message_buffer_size);
+
+#ifdef _WIN32
+    // Windows named pipe always uses message mode
+    message_mode_ = true;
+    async_writer<SocketType>::set_message_mode(true);
+    framing_buffer_ = std::make_shared<std::vector<char>>();
+    LOG_INFO("server_pipe_session: [Windows] message_mode_ set to true by default");
+    std::cout << "[server_pipe_session::ctor] [Windows] message_mode_ = true" << std::endl;
+#endif
 }
 
 template<typename SocketType>
 void server_pipe_session<SocketType>::start() {
     LOG_INFO("server_pipe_session: start() called");
+    std::cout << "[server_pipe_session::start] called, message_mode_=" << message_mode_ << std::endl;
     setup_read_buf();
 
     if (message_mode_) {
         LOG_INFO("server_pipe_session: Using message mode for pipe session");
+        std::cout << "[server_pipe_session::start] entering do_read_message_mode()" << std::endl;
         do_read_message_mode();
     } else {
         LOG_INFO("server_pipe_session: Using standard byte mode for pipe session");
+        std::cout << "[server_pipe_session::start] entering do_read()" << std::endl;
         do_read();
     }
 }
 
 template<typename SocketType>
 void server_pipe_session<SocketType>::setup_read_buf() {
-    LOG_INFO("server_pipe_session: Setting up read buffer for pipe session");
+    LOG_INFO("server_pipe_session: Setting up read buffer");
+    std::cout << "[server_pipe_session::setup_read_buf] zeroing read_buffer_, size=" << read_buffer_.size() << std::endl;
     std::fill(read_buffer_.begin(), read_buffer_.end(), 0);
 }
 
 template<typename SocketType>
 void server_pipe_session<SocketType>::close() {
-    LOG_INFO("server_pipe_session: Closing pipe session.");
+    LOG_INFO("server_pipe_session: Closing pipe session");
+    std::cout << "[server_pipe_session::close] called" << std::endl;
     async_writer<SocketType>::close();
 
     auto self = std::static_pointer_cast<server_pipe_session<SocketType>>(
         async_writer<SocketType>::shared_from_this());
 
     this->write_strand().post([this, self]() {
+        std::cout << "[server_pipe_session::close] invoking parent_->close_pipe_session()" << std::endl;
         parent_->close_pipe_session(self);
     });
 }
@@ -78,6 +98,8 @@ void server_pipe_session<SocketType>::close() {
 template<typename SocketType>
 void server_pipe_session<SocketType>::process_raw_message(const char* data, size_t size) {
     LOG_INFO("server_pipe_session: process_raw_message() called, size={}", size);
+    std::cout << "[server_pipe_session::process_raw_message] called, size=" << size << std::endl;
+    
     try {
         if (enable_pipe_debug || enable_message_tracking) {
             std::string hex_dump;
@@ -87,10 +109,12 @@ void server_pipe_session<SocketType>::process_raw_message(const char* data, size
                 hex_dump += buf;
             }
             LOG_INFO("Raw message content (first 64 bytes): {}", hex_dump);
+            std::cout << "[server_pipe_session::process_raw_message] hex dump: " << hex_dump << std::endl;
         }
 
         RPCLIB_MSGPACK::unpacked result;
         RPCLIB_MSGPACK::unpack(result, data, size);
+        std::cout << "[server_pipe_session::process_raw_message] unpacked msg, calling process_message()" << std::endl;
         process_message(result);
     }
     catch (const std::exception& e) {
@@ -102,6 +126,8 @@ void server_pipe_session<SocketType>::process_raw_message(const char* data, size
 template<typename SocketType>
 void server_pipe_session<SocketType>::process_message(RPCLIB_MSGPACK::object_handle& result) {
     LOG_INFO("server_pipe_session: process_message() called");
+    std::cout << "[server_pipe_session::process_message] called" << std::endl;
+
     auto self = std::static_pointer_cast<server_pipe_session<SocketType>>(
         async_writer<SocketType>::shared_from_this());
 
@@ -121,42 +147,53 @@ void server_pipe_session<SocketType>::process_message(RPCLIB_MSGPACK::object_han
                 LOG_INFO("Processing RPC call ID: {}", call_id);
                 std::string method = msg.via.array.ptr[2].as<std::string>();
                 LOG_INFO("RPC method: '{}', args count: {}", method,
-                         msg.via.array.size > 3 ? msg.via.array.ptr[3].via.array.size : 0);
+                    msg.via.array.size > 3 ? msg.via.array.ptr[3].via.array.size : 0);
+                std::cout << "[server_pipe_session::process_message] call_id: " << call_id 
+                    << ", method: " << method << std::endl;
             }
         } catch (...) {
             LOG_WARN("Could not extract call details from message");
+            std::cout << "[server_pipe_session::process_message] Could not extract call details" << std::endl;
         }
 
         LOG_INFO("Processing request");
+        std::cout << "[server_pipe_session::process_message] calling dispatcher->dispatch()" << std::endl;
         auto resp = disp_->dispatch(msg, suppress_exceptions_);
 
         if (!rpc::this_handler().resp_enabled_) {
             LOG_INFO("Response disabled, not sending anything back");
+            std::cout << "[server_pipe_session::process_message] response disabled" << std::endl;
             return;
         }
 
         if (!rpc::this_handler().error_.get().is_nil()) {
             LOG_WARN("Handler reported error");
+            std::cout << "[server_pipe_session::process_message] handler reported error" << std::endl;
             resp.capture_error(rpc::this_handler().error_);
         } else if (!rpc::this_handler().resp_.get().is_nil()) {
             LOG_INFO("Handler provided special response");
+            std::cout << "[server_pipe_session::process_message] handler provided special response" << std::endl;
             resp.capture_result(rpc::this_handler().resp_);
         }
 
         if (!resp.is_empty()) {
             LOG_INFO("Sending response for call ID: {}", call_id);
+            std::cout << "[server_pipe_session::process_message] sending response for call_id: " << call_id << std::endl;
             this->write(resp.get_data());
             LOG_INFO("server_pipe_session: write() called after process_message");
+            std::cout << "[server_pipe_session::process_message] write() called" << std::endl;
         }
 
         if (rpc::this_session().exit_) {
-            LOG_WARN("Session exit requested from a handler.");
+            LOG_WARN("Session exit requested from handler");
+            std::cout << "[server_pipe_session::process_message] session exit requested" << std::endl;
             this->close();
             return;
         }
 
         if (rpc::this_server().stopping()) {
-            LOG_WARN("Server exit requested from a handler.");
+            LOG_WARN("Server exit requested from handler");
+            std::cout << "[server_pipe_session::process_message] server exit requested" << std::endl;
             parent_->close_sessions();
             return;
         }
@@ -170,50 +207,71 @@ void server_pipe_session<SocketType>::process_message(RPCLIB_MSGPACK::object_han
 #ifdef _WIN32
 template<>
 void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read_message_mode() {
-    LOG_INFO("server_pipe_session: do_read_message_mode() called");
+    LOG_INFO("server_pipe_session: Enter NEW framing/packet handling do_read_message_mode()");
+    std::cout << "[server_pipe_session::do_read_message_mode] NEW: Starting async_read_some" << std::endl;
 
     auto self = std::static_pointer_cast<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>>(
         async_writer<RPCLIB_ASIO::windows::stream_handle>::shared_from_this());
 
-    auto read_length = std::make_shared<std::vector<char>>(4);
-    RPCLIB_ASIO::async_read(
-        this->socket(),
-        RPCLIB_ASIO::buffer(*read_length),
-        read_strand_.wrap([this, self, read_length](std::error_code ec, std::size_t bytes_transferred) {
-            LOG_INFO("server_pipe_session: async_read (length) callback called");
-            if (this->is_closed()) return;
-            if (ec || bytes_transferred != 4) {
-                LOG_ERROR("Error reading message length ({} bytes): {} | '{}'", bytes_transferred, ec.value(), ec.message());
-                this->close();
-                return;
-            }
-            uint32_t msglen = 0;
-            memcpy(&msglen, read_length->data(), 4);
-            LOG_INFO("server_pipe_session: Message length: {}", msglen);
+    if (!this->framing_buffer_) {
+        this->framing_buffer_ = std::make_shared<std::vector<char>>();
+    }
 
-            if (msglen == 0 || msglen > (16*1024*1024)) {
-                LOG_ERROR("Invalid message length: {}", msglen);
+    this->socket().async_read_some(
+        RPCLIB_ASIO::buffer(read_buffer_.data(), read_buffer_.size()),
+        read_strand_.wrap([this, self](std::error_code ec, std::size_t bytes_transferred) {
+            if (this->is_closed()) {
+                std::cout << "[server_pipe_session::do_read_message_mode] Session closed" << std::endl;
+                return;
+            }
+            if (ec) {
+                std::cout << "[server_pipe_session::do_read_message_mode] Error: " << ec.message() << std::endl;
                 this->close();
                 return;
             }
-            auto payload = std::make_shared<std::vector<char>>(msglen);
-            RPCLIB_ASIO::async_read(
-                this->socket(),
-                RPCLIB_ASIO::buffer(*payload),
-                read_strand_.wrap([this, self, payload, msglen](std::error_code ec2, std::size_t bytes_transferred2) {
-                    LOG_INFO("server_pipe_session: async_read (payload) callback called");
-                    if (this->is_closed()) return;
-                    if (ec2 || bytes_transferred2 != msglen) {
-                        LOG_ERROR("Error reading payload ({} bytes): {} | '{}'", bytes_transferred2, ec2.value(), ec2.message());
-                        this->close();
-                        return;
-                    }
-                    LOG_INFO("server_pipe_session: Received framed message, {} bytes", msglen);
-                    process_raw_message(reinterpret_cast<const char*>(payload->data()), msglen);
-                    if (!this->is_closed())
-                        do_read_message_mode();
-                })
-            );
+            if (bytes_transferred == 0) {
+                std::cout << "[server_pipe_session::do_read_message_mode] Zero bytes, retrying" << std::endl;
+                do_read_message_mode();
+                return;
+            }
+
+            std::cout << "[server_pipe_session::do_read_message_mode] Read " << bytes_transferred << " bytes" << std::endl;
+
+            // Append new data to framing buffer
+            framing_buffer_->insert(framing_buffer_->end(), 
+                read_buffer_.data(), read_buffer_.data() + bytes_transferred);
+            
+            std::cout << "[server_pipe_session::do_read_message_mode] Framing buffer size now: " 
+                << framing_buffer_->size() << std::endl;
+
+            // Process complete frames
+            while (framing_buffer_->size() >= 4) {
+                uint32_t payload_len = 0;
+                memcpy(&payload_len, framing_buffer_->data(), 4);
+
+                std::cout << "[server_pipe_session::do_read_message_mode] Got frame length: " 
+                    << payload_len << std::endl;
+
+                if (payload_len == 0 || payload_len > (16 * 1024 * 1024)) {
+                    std::cout << "[server_pipe_session::do_read_message_mode] Invalid payload length" << std::endl;
+                    this->close();
+                    return;
+                }
+
+                if (framing_buffer_->size() < 4 + payload_len) {
+                    std::cout << "[server_pipe_session::do_read_message_mode] Need more data for complete frame" 
+                        << std::endl;
+                    break;
+                }
+
+                std::cout << "[server_pipe_session::do_read_message_mode] Processing complete frame" << std::endl;
+                process_raw_message(framing_buffer_->data() + 4, payload_len);
+                framing_buffer_->erase(framing_buffer_->begin(), 
+                    framing_buffer_->begin() + 4 + payload_len);
+            }
+
+            std::cout << "[server_pipe_session::do_read_message_mode] Continuing read loop" << std::endl;
+            do_read_message_mode();
         })
     );
 }
@@ -223,6 +281,7 @@ void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read_message_m
 template<typename SocketType>
 void server_pipe_session<SocketType>::do_read_message_mode() {
     LOG_INFO("Starting message-mode read operation");
+    std::cout << "[server_pipe_session::do_read_message_mode] called (unix)" << std::endl;
 
     auto self = std::static_pointer_cast<server_pipe_session<SocketType>>(
         async_writer<SocketType>::shared_from_this());
@@ -232,17 +291,20 @@ void server_pipe_session<SocketType>::do_read_message_mode() {
         read_strand_.wrap([this, self](std::error_code ec, std::size_t bytes_read) {
             if (this->is_closed()) {
                 LOG_INFO("Session closed, stopping read");
+                std::cout << "[server_pipe_session::do_read_message_mode] session closed" << std::endl;
                 return;
             }
 
             if (!ec) {
                 if (bytes_read == 0) {
                     LOG_WARN("Read zero bytes in message mode, retrying");
+                    std::cout << "[server_pipe_session::do_read_message_mode] read zero bytes" << std::endl;
                     do_read_message_mode();
                     return;
                 }
 
                 LOG_INFO("Read {} bytes in message mode", bytes_read);
+                std::cout << "[server_pipe_session::do_read_message_mode] read " << bytes_read << " bytes" << std::endl;
 
                 try {
                     process_raw_message(read_buffer_.data(), bytes_read);
@@ -262,9 +324,11 @@ void server_pipe_session<SocketType>::do_read_message_mode() {
             } else if (ec == RPCLIB_ASIO::error::eof ||
                       ec == RPCLIB_ASIO::error::connection_reset) {
                 LOG_INFO("Client disconnected");
+                std::cout << "[server_pipe_session::do_read_message_mode] client disconnected" << std::endl;
                 self->close();
             } else {
                 LOG_ERROR("Error reading in message mode: {} | '{}'", ec, ec.message());
+                std::cout << "[server_pipe_session::do_read_message_mode] error: " << ec.message() << std::endl;
                 self->close();
             }
         }));
@@ -274,13 +338,13 @@ void server_pipe_session<SocketType>::do_read_message_mode() {
 #ifdef _WIN32
 template<>
 void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read() {
-    LOG_INFO("server_pipe_session: do_read() called");
     if (message_mode_) {
         do_read_message_mode();
         return;
     }
 
     LOG_INFO("Starting read operation on Windows Named Pipe (byte mode)");
+    std::cout << "[server_pipe_session::do_read] called" << std::endl;
 
     auto self = std::static_pointer_cast<server_pipe_session>(
         async_writer<RPCLIB_ASIO::windows::stream_handle>::shared_from_this());
@@ -290,17 +354,20 @@ void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read() {
         read_strand_.wrap([this, self](std::error_code ec, std::size_t length) {
             if (this->is_closed()) {
                 LOG_INFO("Pipe session closed, stopping read");
+                std::cout << "[server_pipe_session::do_read] session closed" << std::endl;
                 return;
             }
 
             if (!ec) {
                 if (length == 0) {
                     LOG_WARN("Read zero bytes from Windows Named Pipe, retrying");
+                    std::cout << "[server_pipe_session::do_read] read zero bytes" << std::endl;
                     do_read();
                     return;
                 }
 
                 LOG_INFO("Read {} bytes from Windows Named Pipe", length);
+                std::cout << "[server_pipe_session::do_read] read " << length << " bytes" << std::endl;
 
                 try {
                     if (enable_pipe_debug || enable_message_tracking) {
@@ -311,6 +378,7 @@ void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read() {
                             hex_dump += buf;
                         }
                         LOG_INFO("Received data (first 64 bytes): {}", hex_dump);
+                        std::cout << "[server_pipe_session::do_read] hex dump: " << hex_dump << std::endl;
                     }
 
                     pac_.reserve_buffer(length);
@@ -320,6 +388,7 @@ void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read() {
                     RPCLIB_MSGPACK::object_handle result;
                     while (pac_.next(result) && !this->is_closed()) {
                         LOG_INFO("Processing message");
+                        std::cout << "[server_pipe_session::do_read] processing message" << std::endl;
                         process_message(result);
                     }
 
@@ -342,9 +411,11 @@ void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read() {
             } else if (ec == RPCLIB_ASIO::error::eof ||
                        ec == RPCLIB_ASIO::error::connection_reset) {
                 LOG_INFO("Windows Named Pipe client disconnected");
+                std::cout << "[server_pipe_session::do_read] client disconnected" << std::endl;
                 self->close();
             } else {
                 LOG_ERROR("Windows Named Pipe error: {} | '{}'", ec, ec.message());
+                std::cout << "[server_pipe_session::do_read] error: " << ec.message() << std::endl;
                 self->close();
             }
         }));
@@ -352,11 +423,13 @@ void server_pipe_session<RPCLIB_ASIO::windows::stream_handle>::do_read() {
 #else
 template<typename SocketType>
 void server_pipe_session<SocketType>::do_read() {
-    LOG_INFO("server_pipe_session: do_read() called");
     if (message_mode_) {
         do_read_message_mode();
         return;
     }
+
+    LOG_INFO("server_pipe_session: do_read() called");
+    std::cout << "[server_pipe_session::do_read] called (unix)" << std::endl;
 
     auto self = std::static_pointer_cast<server_pipe_session<SocketType>>(
         async_writer<SocketType>::shared_from_this());
@@ -366,10 +439,14 @@ void server_pipe_session<SocketType>::do_read() {
         RPCLIB_ASIO::buffer(pac_.buffer(), pipe_default_buffer_size),
         read_strand_.wrap([this, self, max_read_bytes](std::error_code ec,
                                                      std::size_t length) {
-            if (this->is_closed()) { return; }
+            if (this->is_closed()) {
+                std::cout << "[server_pipe_session::do_read] session closed" << std::endl;
+                return;
+            }
             if (!ec) {
                 if (length == 0) {
                     LOG_WARN("Read zero bytes, retrying");
+                    std::cout << "[server_pipe_session::do_read] read zero bytes" << std::endl;
                     do_read();
                     return;
                 }
@@ -390,9 +467,11 @@ void server_pipe_session<SocketType>::do_read() {
             } else if (ec == RPCLIB_ASIO::error::eof ||
                        ec == RPCLIB_ASIO::error::connection_reset) {
                 LOG_INFO("Client disconnected");
+                std::cout << "[server_pipe_session::do_read] client disconnected" << std::endl;
                 self->close();
             } else {
                 LOG_ERROR("Unhandled error code: {} | '{}'", ec, ec.message());
+                std::cout << "[server_pipe_session::do_read] error: " << ec.message() << std::endl;
             }
         }));
 }
