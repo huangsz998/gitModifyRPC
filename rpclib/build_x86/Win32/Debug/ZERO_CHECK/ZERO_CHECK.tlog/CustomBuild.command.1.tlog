@@ -1,0 +1,10 @@
+^E:\MODIFYRPC\RPCLIB\BUILD_X86\CMAKEFILES\F8EA8DA6BFEACB029967B7B9AAC62244\GENERATE.STAMP.RULE
+setlocal
+C:\Users\LeiGod\scoop\apps\cmake\current\bin\cmake.exe -SE:/modifyRPC/rpclib -BE:/modifyRPC/rpclib/build_x86 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/modifyRPC/rpclib/build_x86/rpc.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

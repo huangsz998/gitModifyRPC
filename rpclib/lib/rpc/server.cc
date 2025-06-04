@@ -91,63 +91,63 @@ namespace rpc {
 #else
         // Windows Named Pipe
         impl(server *parent, std::string const &pipe_name)
-        : parent_(parent),
-          io_(),
-          acceptor_(io_),
-          socket_(io_),
-          suppress_exceptions_(false),
-          conn_type_(conn_type::NAMED_PIPE),
-          pipe_name_(pipe_name),
-          use_named_pipe_message_mode_(true) {
-            full_pipe_name_ = "\\\\.\\pipe\\" + pipe_name;
-            LOG_INFO("Creating Windows Named Pipe: {}", full_pipe_name_);
-            std::cout << "Creating Windows Named Pipe: " << full_pipe_name_ << std::endl;
-            pipe_handle_ = CreateNamedPipeA(
-                full_pipe_name_.c_str(),
-                PIPE_ACCESS_DUPLEX, // Must NOT include FILE_FLAG_OVERLAPPED
-                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-                PIPE_UNLIMITED_INSTANCES,
-                8192, 8192, 0, NULL);
-            if (pipe_handle_ == INVALID_HANDLE_VALUE) {
-                DWORD error = GetLastError();
-                std::string err_msg = RPCLIB_FMT::format(
-                    "Failed to create Windows Named Pipe: {}, error code: {}",
-                    full_pipe_name_, error);
-                LOG_ERROR(err_msg);
-                throw std::runtime_error(err_msg);
-            }
-            LOG_INFO("Created server with Windows Named Pipe: {}", full_pipe_name_);
-            std::cout << "Created server with Windows Named Pipe: " << full_pipe_name_ << std::endl;
-        }
-#endif
+         : parent_(parent),
+           io_(),
+           acceptor_(io_),
+           socket_(io_),
+           suppress_exceptions_(false),
+           conn_type_(conn_type::NAMED_PIPE),
+           pipe_name_(pipe_name),
+           use_named_pipe_message_mode_(true) {
+             full_pipe_name_ = "\\\\.\\pipe\\" + pipe_name;
+             LOG_INFO("Creating Windows Named Pipe: {}", full_pipe_name_);
+             std::cout << "Creating Windows Named Pipe: " << full_pipe_name_ << std::endl;
+             pipe_handle_ = CreateNamedPipeA(
+                 full_pipe_name_.c_str(),
+                 PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+                 PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                 PIPE_UNLIMITED_INSTANCES,
+                 8192, 8192, 0, NULL);
+             if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                 DWORD error = GetLastError();
+                 std::string err_msg = RPCLIB_FMT::format(
+                     "Failed to create Windows Named Pipe: {}, error code: {}",
+                     full_pipe_name_, error);
+                 LOG_ERROR(err_msg);
+                 throw std::runtime_error(err_msg);
+             }
+             LOG_INFO("Created server with Windows Named Pipe: {}", full_pipe_name_);
+             std::cout << "Created server with Windows Named Pipe: " << full_pipe_name_ << std::endl;
+         }
+ #endif
 
 #ifdef _WIN32
-        void convert_to_named_pipe(std::string const &pipe_name) {
-            acceptor_.close();
-            socket_.close();
-            conn_type_ = conn_type::NAMED_PIPE;
-            pipe_name_ = pipe_name;
-            use_named_pipe_message_mode_ = true;
-            full_pipe_name_ = "\\\\.\\pipe\\" + pipe_name;
-            LOG_INFO("Creating Windows Named Pipe: {}", full_pipe_name_);
-            std::cout << "Creating Windows Named Pipe: " << full_pipe_name_ << std::endl;
-            pipe_handle_ = CreateNamedPipeA(
-                full_pipe_name_.c_str(),
-                PIPE_ACCESS_DUPLEX,
-                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-                PIPE_UNLIMITED_INSTANCES,
-                8192, 8192, 0, NULL);
-            if (pipe_handle_ == INVALID_HANDLE_VALUE) {
-                DWORD error = GetLastError();
-                std::string err_msg = RPCLIB_FMT::format(
-                    "Failed to create Windows Named Pipe: {}, error code: {}",
-                    full_pipe_name_, error);
-                LOG_ERROR(err_msg);
-                throw std::runtime_error(err_msg);
-            }
-            LOG_INFO("Created server with Windows Named Pipe: {}", full_pipe_name_);
-            std::cout << "Created server with Windows Named Pipe: " << full_pipe_name_ << std::endl;
-        }
+void convert_to_named_pipe(std::string const &pipe_name) {
+    acceptor_.close();
+    socket_.close();
+    conn_type_ = conn_type::NAMED_PIPE;
+    pipe_name_ = pipe_name;
+    use_named_pipe_message_mode_ = true;
+    full_pipe_name_ = "\\\\.\\pipe\\" + pipe_name;
+    LOG_INFO("Creating Windows Named Pipe: {}", full_pipe_name_);
+    std::cout << "Creating Windows Named Pipe: " << full_pipe_name_ << std::endl;
+    pipe_handle_ = CreateNamedPipeA(
+        full_pipe_name_.c_str(),
+        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+        PIPE_UNLIMITED_INSTANCES,
+        8192, 8192, 0, NULL);
+    if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+        DWORD error = GetLastError();
+        std::string err_msg = RPCLIB_FMT::format(
+            "Failed to create Windows Named Pipe: {}, error code: {}",
+            full_pipe_name_, error);
+        LOG_ERROR(err_msg);
+        throw std::runtime_error(err_msg);
+    }
+    LOG_INFO("Created server with Windows Named Pipe: {}", full_pipe_name_);
+    std::cout << "Created server with Windows Named Pipe: " << full_pipe_name_ << std::endl;
+}
 
         void set_named_pipe_options() {
             use_named_pipe_message_mode_ = true;
@@ -160,99 +160,108 @@ namespace rpc {
         }
 #endif
 
-        void start_accept() {
-            if (conn_type_ == conn_type::TCP) {
-                acceptor_.async_accept(socket_, [this](std::error_code ec) {
-                    if (!ec) {
-                        auto ep = socket_.remote_endpoint();
-                        LOG_INFO("Accepted TCP connection from {}:{}", ep.address(), ep.port());
-                        auto s = std::make_shared<server_session>( parent_, &io_, std::move(socket_), parent_->disp_, suppress_exceptions_);
-                        s->start();
-                        std::unique_lock<std::mutex> lock(sessions_mutex_);
-                        sessions_.push_back(s);
-                        tcp_sessions_.push_back(s);
-                    } else {
-                        LOG_ERROR("Error while accepting TCP connection: {}", ec);
+void start_accept() {
+    if (conn_type_ == conn_type::TCP) {
+        acceptor_.async_accept(socket_, [this](std::error_code ec) {
+            if (!ec) {
+                auto ep = socket_.remote_endpoint();
+                LOG_INFO("Accepted TCP connection from {}:{}", ep.address(), ep.port());
+                auto s = std::make_shared<server_session>( parent_, &io_, std::move(socket_), parent_->disp_, suppress_exceptions_);
+                s->start();
+                std::unique_lock<std::mutex> lock(sessions_mutex_);
+                sessions_.push_back(s);
+                tcp_sessions_.push_back(s);
+            } else {
+                LOG_ERROR("Error while accepting TCP connection: {}", ec);
+            }
+            if (!this_server().stopping())
+                start_accept();
+        });
+    }
+#ifdef _WIN32
+    else {
+        if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+            LOG_ERROR("Invalid pipe handle when trying to accept connection");
+            std::cerr << "Invalid pipe handle when trying to accept connection" << std::endl;
+            return;
+        }
+        io_.post([this]() {
+            try {
+                LOG_INFO("Waiting for client connection on pipe: {}", pipe_name_);
+                std::cout << "Waiting for client connection on pipe: " << pipe_name_ << std::endl;
+                BOOL connected = ConnectNamedPipe(pipe_handle_, NULL);
+                DWORD last_error = GetLastError();
+                if (connected || last_error == ERROR_PIPE_CONNECTED) {
+                    LOG_INFO("Client connected to Windows Named Pipe");
+                    std::cout << "Client connected to pipe" << std::endl;
+                    HANDLE session_handle = pipe_handle_;
+                    // Create a new pipe instance for the next connection
+                    pipe_handle_ = CreateNamedPipeA(
+                        full_pipe_name_.c_str(),
+                        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // 必须加 FILE_FLAG_OVERLAPPED
+                        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                        PIPE_UNLIMITED_INSTANCES,
+                        8192, 8192, 0, NULL);
+                    if (pipe_handle_ == INVALID_HANDLE_VALUE) {
+                        DWORD error = GetLastError();
+                        LOG_ERROR("Failed to create new pipe instance: {}", error);
+                    }
+                    DWORD mode = PIPE_READMODE_MESSAGE;
+                    if (!SetNamedPipeHandleState(session_handle, &mode, NULL, NULL)) {
+                        DWORD error = GetLastError();
+                        LOG_ERROR("Failed to set pipe mode to message mode: {}", error);
+                        CloseHandle(session_handle);
+                        throw std::runtime_error("Failed to set pipe mode");
+                    }
+                    try {
+                        auto session = std::make_shared<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>>(
+                            parent_, &io_, RPCLIB_ASIO::windows::stream_handle(io_, session_handle),
+                            parent_->disp_, suppress_exceptions_);
+                        LOG_INFO("server.cc: server_pipe_session created");
+
+                        if (use_named_pipe_message_mode_) {
+                            session->set_message_mode(true);
+                            LOG_INFO("server.cc: Created pipe session with message mode enabled");
+                        }
+
+                        // 关键修正：先保存 session 到容器，再 start
+                        {
+                            std::unique_lock<std::mutex> lock(sessions_mutex_);
+                            sessions_.push_back(session);
+                            win_pipe_sessions_.push_back(session);
+                             LOG_INFO("server.cc: session pushed to sessions_ and win_pipe_sessions_");
+                        }
+
+                        session->start();
+                         LOG_INFO("server.cc: Pipe session start() called");
+                    } catch (const std::exception& ex) {
+                        LOG_ERROR("Exception creating pipe session: {}", ex.what());
+                        std::cerr << "Exception creating pipe session: " << ex.what() << std::endl;
                     }
                     if (!this_server().stopping())
                         start_accept();
-                });
-            }
-#ifdef _WIN32
-            else {
-                if (pipe_handle_ == INVALID_HANDLE_VALUE) {
-                    LOG_ERROR("Invalid pipe handle when trying to accept connection");
-                    std::cerr << "Invalid pipe handle when trying to accept connection" << std::endl;
-                    return;
+                } else {
+                    if (!this_server().stopping())
+                        start_accept();
                 }
-                io_.post([this]() {
-                    try {
-                        LOG_INFO("Waiting for client connection on pipe: {}", pipe_name_);
-                        std::cout << "Waiting for client connection on pipe: " << pipe_name_ << std::endl;
-                        BOOL connected = ConnectNamedPipe(pipe_handle_, NULL);
-                        DWORD last_error = GetLastError();
-                        if (connected || last_error == ERROR_PIPE_CONNECTED) {
-                            LOG_INFO("Client connected to Windows Named Pipe");
-                            std::cout << "Client connected to pipe" << std::endl;
-                            HANDLE session_handle = pipe_handle_;
-                            // Create a new pipe instance for the next connection
-                            pipe_handle_ = CreateNamedPipeA(
-                                full_pipe_name_.c_str(),
-                                PIPE_ACCESS_DUPLEX,
-                                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-                                PIPE_UNLIMITED_INSTANCES,
-                                8192, 8192, 0, NULL);
-                            if (pipe_handle_ == INVALID_HANDLE_VALUE) {
-                                DWORD error = GetLastError();
-                                LOG_ERROR("Failed to create new pipe instance: {}", error);
-                            }
-                            DWORD mode = PIPE_READMODE_MESSAGE;
-                            if (!SetNamedPipeHandleState(session_handle, &mode, NULL, NULL)) {
-                                DWORD error = GetLastError();
-                                LOG_ERROR("Failed to set pipe mode to message mode: {}", error);
-                                CloseHandle(session_handle);
-                                throw std::runtime_error("Failed to set pipe mode");
-                            }
-                            try {
-                                auto session = std::make_shared<server_pipe_session<RPCLIB_ASIO::windows::stream_handle>>(
-                                    parent_, &io_, RPCLIB_ASIO::windows::stream_handle(io_, session_handle),
-                                    parent_->disp_, suppress_exceptions_);
-                                if (use_named_pipe_message_mode_) {
-                                    session->set_message_mode(true);
-                                    LOG_INFO("Created pipe session with message mode enabled");
-                                }
-                                session->start();
-                                std::unique_lock<std::mutex> lock(sessions_mutex_);
-                                sessions_.push_back(session);
-                                win_pipe_sessions_.push_back(session);
-                            } catch (const std::exception& ex) {
-                                LOG_ERROR("Exception creating pipe session: {}", ex.what());
-                                std::cerr << "Exception creating pipe session: " << ex.what() << std::endl;
-                            }
-                            if (!this_server().stopping())
-                                start_accept();
-                        } else {
-                            if (!this_server().stopping())
-                                start_accept();
-                        }
-                    } catch (const std::exception &e) {
-                        LOG_ERROR("Exception in pipe acceptance: {}", e.what());
-                        std::cerr << "Pipe acceptance exception: " << e.what() << std::endl;
-                        if (pipe_handle_ != INVALID_HANDLE_VALUE) {
-                            DisconnectNamedPipe(pipe_handle_);
-                            CloseHandle(pipe_handle_);
-                            pipe_handle_ = CreateNamedPipeA(
-                                full_pipe_name_.c_str(),
-                                PIPE_ACCESS_DUPLEX,
-                                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-                                PIPE_UNLIMITED_INSTANCES,
-                                8192, 8192, 0, NULL);
-                        }
-                        if (!this_server().stopping())
-                            io_.post([this]() { start_accept(); });
-                    }
-                });
+            } catch (const std::exception &e) {
+                LOG_ERROR("Exception in pipe acceptance: {}", e.what());
+                std::cerr << "Pipe acceptance exception: " << e.what() << std::endl;
+                if (pipe_handle_ != INVALID_HANDLE_VALUE) {
+                    DisconnectNamedPipe(pipe_handle_);
+                    CloseHandle(pipe_handle_);
+                    pipe_handle_ = CreateNamedPipeA(
+                        full_pipe_name_.c_str(),
+                        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // 必须加 FILE_FLAG_OVERLAPPED
+                        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+                        PIPE_UNLIMITED_INSTANCES,
+                        8192, 8192, 0, NULL);
+                }
+                if (!this_server().stopping())
+                    io_.post([this]() { start_accept(); });
             }
+        });
+    }
 #else
             else {
                 pipe_acceptor_->async_accept(*pipe_socket_, [this](std::error_code ec) {
@@ -362,8 +371,7 @@ namespace rpc {
             return 0;
         }
         std::string pipe_name() const { return pipe_name_; }
-        server::connection_type get_connection_type() const {
-            return conn_type_ == conn_type::TCP ?
+        server::connection_type get_connection_type() const { return conn_type_ == conn_type::TCP ?
                 server::connection_type::TCP :
                 server::connection_type::NAMED_PIPE;
         }
@@ -406,13 +414,6 @@ namespace rpc {
 
     server::server(server &&other) noexcept {
         *this = std::move(other);
-    }
-
-    server::server(std::string const &address, uint16_t port)
-            : pimpl(new server::impl(this, address, port)),
-              disp_(std::make_shared<dispatcher>()) {
-        LOG_INFO("Created server on address {}:{}", address, port);
-        pimpl->start_accept();
     }
 
     server::server(std::string const &pipe_name)

@@ -134,7 +134,7 @@ namespace rpc {
                         0,
                         NULL,
                         OPEN_EXISTING,
-                        0, // Must be 0! (not FILE_FLAG_OVERLAPPED)
+                        FILE_FLAG_OVERLAPPED,
                         NULL);
                     if (pipe_handle_ != INVALID_HANDLE_VALUE) {
                         LOG_INFO("Connected to Windows Named Pipe on attempt {}", i + 1);
@@ -173,17 +173,17 @@ namespace rpc {
                     throw std::runtime_error("Failed to set pipe to message mode");
                 }
                 try {
-                    // Directly move pipe_handle_ to stream_handle in async_writer
                     writer_pipe_win_ = std::make_shared<detail::async_writer<RPCLIB_ASIO::windows::stream_handle>>(
                         &io_, RPCLIB_ASIO::windows::stream_handle(io_, pipe_handle_));
-                    pipe_handle_ = INVALID_HANDLE_VALUE; // No longer manage the handle manually
+                    writer_pipe_win_->set_message_mode(true);
+                    pipe_handle_ = INVALID_HANDLE_VALUE;
                     std::unique_lock<std::mutex> lock(mut_connection_finished_);
                     LOG_INFO("Client connected to Windows Named Pipe: {}", full_pipe_name_);
                     std::cout << "Client successfully connected to pipe: " << full_pipe_name_ << std::endl;
                     is_connected_ = true;
                     state_ = client::connection_state::connected;
                     conn_finished_.notify_all();
-                    do_read_pipe_win_message();
+                    do_read_pipe_win_message_framing();
                     LOG_INFO("Named Pipe client fully initialized with message mode");
                 } catch (const std::exception &ex) {
                     LOG_ERROR("Error during Windows Named Pipe stream creation: {}", ex.what());
@@ -223,36 +223,57 @@ namespace rpc {
         }
 
 #ifdef _WIN32
-        void do_read_pipe_win_message() {
-            LOG_INFO("Reading from Windows Named Pipe in message mode");
-            if (!writer_pipe_win_ || !is_connected_) {
-                LOG_ERROR("Writer is null or client disconnected in message mode read");
-                std::cerr << "Writer is null or client disconnected in message mode read" << std::endl;
-                return;
-            }
-            writer_pipe_win_->stream().async_read_some(
-                RPCLIB_ASIO::buffer(read_buffer_.data(), read_buffer_.size()),
-                strand_.wrap([this](std::error_code ec, std::size_t bytes_read) {
-                    if (ec) {
-                        if (ec == RPCLIB_ASIO::error::eof || ec == RPCLIB_ASIO::error::connection_reset) {
-                            LOG_WARN("Pipe connection closed by server");
-                            std::cerr << "Pipe connection closed by server" << std::endl;
-                            state_ = client::connection_state::disconnected;
+        // New: Message mode framing read for Windows Named Pipe
+        void do_read_pipe_win_message_framing() {
+            auto self = this;
+            auto& stream = writer_pipe_win_->stream();
+            auto read_loop = [this, self, &stream]() {
+                while (state_ == client::connection_state::connected) {
+                    try {
+                        auto frame = detail::async_writer<RPCLIB_ASIO::windows::stream_handle>::read_framed(stream);
+                        if (!frame.empty()) {
+                            pac_.reserve_buffer(frame.size());
+                            memcpy(pac_.buffer(), frame.data(), frame.size());
+                            pac_.buffer_consumed(frame.size());
+                            RPCLIB_MSGPACK::unpacked result;
+                            while (pac_.next(result)) {
+                                auto r = response(std::move(result));
+                                auto id = r.get_id();
+                                auto it = ongoing_calls_.find(id);
+                                if (it != ongoing_calls_.end()) {
+                                    auto &current_call = it->second;
+                                    try {
+                                        if (r.get_error()) {
+                                            throw rpc_error("rpc::rpc_error during call",
+                                                            std::get<0>(current_call),
+                                                            r.get_error());
+                                        }
+                                        std::get<1>(current_call)
+                                                .set_value(std::move(*r.get_result()));
+                                    } catch (...) {
+                                        std::get<1>(current_call)
+                                                .set_exception(std::current_exception());
+                                    }
+                                    strand_.post(
+                                            [this, id]() { ongoing_calls_.erase(id); });
+                                } else {
+                                    LOG_WARN("Received response for unknown call id: {}", id);
+                                }
+                            }
                         } else {
-                            LOG_ERROR("Error reading from pipe: {} ({})", ec.value(), ec.message());
-                            std::cerr << "Error reading from pipe: " << ec.message() << std::endl;
+                            LOG_WARN("Received empty framed message from pipe, closing connection.");
+                            state_ = client::connection_state::disconnected;
+                            break;
                         }
-                        return;
+                    } catch (const std::exception& e) {
+                        LOG_ERROR("Framing read error in pipe: {}", e.what());
+                        state_ = client::connection_state::disconnected;
+                        break;
                     }
-                    if (bytes_read == 0) {
-                        LOG_WARN("Read zero bytes from pipe, retrying");
-                        std::cerr << "Read zero bytes from pipe, retrying" << std::endl;
-                        do_read_pipe_win_message();
-                        return;
-                    }
-                    std::fill(read_buffer_.begin(), read_buffer_.end(), 0);
-                    do_read_pipe_win_message();
-                }));
+                }
+            };
+            // Start the read loop in a background thread
+            std::thread(read_loop).detach();
         }
 #endif
 
@@ -309,18 +330,31 @@ namespace rpc {
                    client::connection_type::NAMED_PIPE;
         }
         void write(RPCLIB_MSGPACK::sbuffer item) {
+            std::cout << "[pimpl->write] called, conn_type_=" << static_cast<int>(conn_type_) << std::endl;
             if (conn_type_ == conn_type::TCP) {
-                writer_tcp_->write(std::move(item));
+                std::cout << "[pimpl->write] using writer_tcp_ to write, sbuffer size=" << item.size() << std::endl;
+                if (writer_tcp_) {
+                    writer_tcp_->write(std::move(item));
+                } else {
+                    std::cout << "[pimpl->write] writer_tcp_ is nullptr!" << std::endl;
+                }
             }
-#ifdef _WIN32
+        #ifdef _WIN32
             else if (writer_pipe_win_) {
+                std::cout << "[pimpl->write] using writer_pipe_win_ to write, sbuffer size=" << item.size() << std::endl;
                 writer_pipe_win_->write(std::move(item));
             }
-#endif
+            else {
+                std::cout << "[pimpl->write] writer_pipe_win_ is nullptr!" << std::endl;
+                LOG_ERROR("No valid writer available for write operation (writer_pipe_win_ is nullptr)");
+                std::cerr << "No valid writer available for write operation (writer_pipe_win_ is nullptr)" << std::endl;
+            }
+        #else
             else {
                 LOG_ERROR("No valid writer available for write operation");
                 std::cerr << "No valid writer available for write operation" << std::endl;
             }
+        #endif
         }
         nonstd::optional<int64_t> get_timeout() { return timeout_; }
         void set_timeout(int64_t value) { timeout_ = value; }
@@ -371,57 +405,62 @@ namespace rpc {
     }
 
     client::client(std::string const &pipe_name)
-            : pimpl(new client::impl(this, pipe_name)) {
+        : pimpl(new client::impl(this, pipe_name)) {
+    set_timeout(15000);
+
+    // 1. 先启动 io_service 的 run 线程
+    std::thread io_thread([this]() {
         try {
-            set_timeout(15000);
-#ifndef _WIN32
-            struct stat buffer;
-            bool file_exists = (stat(pipe_name.c_str(), &buffer) == 0);
-            if (!file_exists) {
-                std::string err_msg = RPCLIB_FMT::format(
-                        "Unix Domain Socket file does not exist: {}", pipe_name);
-                LOG_ERROR(err_msg);
-                throw std::runtime_error(err_msg);
-            } else if (!S_ISSOCK(buffer.st_mode)) {
-                std::string err_msg = RPCLIB_FMT::format(
-                        "Path exists but is not a valid socket: {}", pipe_name);
-                LOG_ERROR(err_msg);
-                throw std::runtime_error(err_msg);
-            }
-#endif
-            pimpl->do_connect_pipe();
-            std::thread io_thread([this]() {
-                try {
-                    RPCLIB_CREATE_LOG_CHANNEL(client)
-                    name_thread("client_pipe");
-                    pimpl->io_.run();
-                } catch (const std::exception &ex) {
-                    LOG_ERROR("Exception in io_thread: {}", ex.what());
-                    std::cerr << "IO thread exception: " << ex.what() << std::endl;
-                }
-            });
-            pimpl->io_thread_ = std::move(io_thread);
-            try {
-                LOG_INFO("Trying initial connection...");
-                wait_conn();
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            } catch (const rpc::timeout &ex) {
-                LOG_WARN("Initial connection timed out, will retry later: {}", ex.what());
-                std::cerr << "Initial connection timed out: " << ex.what() << std::endl;
-            } catch (const std::runtime_error &ex) {
-                LOG_ERROR("Critical connection error: {}", ex.what());
-                std::cerr << "Critical connection error: " << ex.what() << std::endl;
-                throw;
-            } catch (const std::exception &ex) {
-                LOG_WARN("Initial connection failed: {}, will retry later", ex.what());
-                std::cerr << "Initial connection failed: " << ex.what() << std::endl;
-            }
+            RPCLIB_CREATE_LOG_CHANNEL(client)
+            name_thread("client_pipe");
+            pimpl->io_.run();
         } catch (const std::exception &ex) {
-            LOG_ERROR("Failed to initialize client: {}", ex.what());
-            std::cerr << "Failed to initialize client: " << ex.what() << std::endl;
-            throw;
+            LOG_ERROR("Exception in io_thread: {}", ex.what());
+            std::cerr << "IO thread exception: " << ex.what() << std::endl;
         }
+    });
+    pimpl->io_thread_ = std::move(io_thread);
+
+#ifndef _WIN32
+    struct stat buffer;
+    bool file_exists = (stat(pipe_name.c_str(), &buffer) == 0);
+    if (!file_exists) {
+        std::string err_msg = RPCLIB_FMT::format(
+                "Unix Domain Socket file does not exist: {}", pipe_name);
+        LOG_ERROR(err_msg);
+        throw std::runtime_error(err_msg);
+    } else if (!S_ISSOCK(buffer.st_mode)) {
+        std::string err_msg = RPCLIB_FMT::format(
+                "Path exists but is not a valid socket: {}", pipe_name);
+        LOG_ERROR(err_msg);
+        throw std::runtime_error(err_msg);
     }
+#endif
+
+    try {
+        pimpl->do_connect_pipe();
+        try {
+            LOG_INFO("Trying initial connection...");
+            wait_conn();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        } catch (const rpc::timeout &ex) {
+            LOG_WARN("Initial connection timed out, will retry later: {}", ex.what());
+            std::cerr << "Initial connection timed out: " << ex.what() << std::endl;
+        } catch (const std::runtime_error &ex) {
+            LOG_ERROR("Critical connection error: {}", ex.what());
+            std::cerr << "Critical connection error: " << ex.what() << std::endl;
+            throw;
+        } catch (const std::exception &ex) {
+            LOG_WARN("Initial connection failed: {}, will retry later", ex.what());
+            std::cerr << "Initial connection failed: " << ex.what() << std::endl;
+        }
+    } catch (const std::exception &ex) {
+        LOG_ERROR("Failed to initialize client: {}", ex.what());
+        std::cerr << "Failed to initialize client: " << ex.what() << std::endl;
+        // io_thread_ 已经被启动，此处不能再 throw，或可选择设置状态，主流程抛异常
+        throw;
+    }
+}
 
     void client::wait_conn() {
         std::unique_lock<std::mutex> lock(pimpl->mut_connection_finished_);
@@ -518,24 +557,35 @@ namespace rpc {
 
     int client::get_next_call_idx() { return ++(pimpl->call_idx_); }
     void client::post(std::shared_ptr<RPCLIB_MSGPACK::sbuffer> buffer, int idx,
-                      std::string const &func_name,
-                      std::shared_ptr<rsp_promise> p) {
-        pimpl->strand_.post([=]() {
-            if (enable_message_tracking || enable_pipe_debug) {
-                LOG_INFO("Posting RPC call '{}' with ID {}", func_name, idx);
-                std::cout << "Posting RPC call '" << func_name << "' with ID " << idx << std::endl;
-            }
-            pimpl->ongoing_calls_.insert(
-                    std::make_pair(idx, std::make_pair(func_name, std::move(*p))));
-            pimpl->write(std::move(*buffer));
-        });
-    }
-    void client::post(RPCLIB_MSGPACK::sbuffer *buffer) {
-        pimpl->strand_.post([=]() {
+                  std::string const &func_name,
+                  std::shared_ptr<rsp_promise> p) {
+    std::cout << "[client::post] called (with idx, func_name='" << func_name << "')" << std::endl;
+    pimpl->strand_.post([=]() {
+        std::cout << "[client::post/strand] lambda running for func_name='" << func_name << "', idx=" << idx << std::endl;
+        if (enable_message_tracking || enable_pipe_debug) {
+            LOG_INFO("Posting RPC call '{}' with ID {}", func_name, idx);
+            std::cout << "Posting RPC call '" << func_name << "' with ID " << idx << std::endl;
+        }
+        pimpl->ongoing_calls_.insert(
+                std::make_pair(idx, std::make_pair(func_name, std::move(*p))));
+        std::cout << "[client::post/strand] calling pimpl->write(), buffer size=" << (buffer ? buffer->size() : 0) << std::endl;
+        pimpl->write(std::move(*buffer));
+    });
+}
+
+void client::post(RPCLIB_MSGPACK::sbuffer *buffer) {
+    std::cout << "[client::post] called (notification/one-way), buffer ptr=" << buffer << std::endl;
+    pimpl->strand_.post([=]() {
+        std::cout << "[client::post/strand] notification lambda running, buffer ptr=" << buffer << std::endl;
+        if (buffer) {
+            std::cout << "[client::post/strand] calling pimpl->write(), buffer size=" << buffer->size() << std::endl;
             pimpl->write(std::move(*buffer));
             delete buffer;
-        });
-    }
+        } else {
+            std::cout << "[client::post/strand] buffer is nullptr!" << std::endl;
+        }
+    });
+}
     client::connection_state client::get_connection_state() const { return pimpl->get_connection_state(); }
     client::connection_type client::get_connection_type() const { return pimpl->get_connection_type(); }
     nonstd::optional<int64_t> client::get_timeout() const { return pimpl->get_timeout(); }

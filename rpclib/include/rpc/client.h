@@ -152,13 +152,13 @@ public:
     //! \brief Waits for the completion of all ongoing calls.
     void wait_all_responses();
 
+    void wait_conn();
+
 private:
     //! \brief Type of a promise holding a future response.
     using rsp_promise = std::promise<RPCLIB_MSGPACK::object_handle>;
 
     enum class request_type { call = 0, notification = 2 };
-
-    void wait_conn();
     void post(std::shared_ptr<RPCLIB_MSGPACK::sbuffer> buffer, int idx,
               std::string const& func_name,
               std::shared_ptr<rsp_promise> p);

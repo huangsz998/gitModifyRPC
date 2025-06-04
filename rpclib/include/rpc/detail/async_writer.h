@@ -10,9 +10,10 @@
 #include <mutex>
 #include <thread>
 #include <type_traits>
+#include <vector>
+#include <iostream> // For std::cout
 
 #include "asio.hpp"
-
 #include "rpc/config.h"
 #include "rpc/msgpack.hpp"
 
@@ -40,7 +41,7 @@ struct socket_traits<RPCLIB_ASIO::windows::stream_handle> {
 };
 #endif
 
-// Helper function for writing to different socket types - FIXED WITH COMMON INTERFACE
+// Helper function for writing to different socket types
 template <typename T>
 inline void write_helper(T &s, RPCLIB_MSGPACK::sbuffer &buf, bool /* message_mode */ = false) {
     // Standard async_write for most socket types
@@ -64,6 +65,15 @@ inline void write_helper<RPCLIB_ASIO::windows::stream_handle>(
         framed.resize(4 + buf.size());
         memcpy(framed.data(), &len, 4); // Little-endian
         memcpy(framed.data() + 4, buf.data(), buf.size());
+
+        // --- Log framing header and part of content ---
+        std::cout << "[async_writer] [framing write] Length prefix: " << len << ", total bytes: " << framed.size() << std::endl;
+        std::cout << "[async_writer] [framing write] First 16 bytes (hex): ";
+        for (size_t i = 0; i < std::min(size_t(16), framed.size()); ++i) {
+            printf("%02x ", (unsigned char)framed[i]);
+        }
+        std::cout << std::endl;
+
         try {
             RPCLIB_ASIO::write(
                 s, RPCLIB_ASIO::buffer(framed.data(), framed.size()));
@@ -80,7 +90,7 @@ inline void write_helper<RPCLIB_ASIO::windows::stream_handle>(
 }
 #endif
 
-//! \brief Template class to support different socket types
+//! \brief Template class to support different socket types, with pipe framing logic for both write and read
 template <typename SocketType>
 class async_writer : public std::enable_shared_from_this<async_writer<SocketType>> {
 public:
@@ -90,29 +100,27 @@ public:
           is_writing_(false),
           exit_(false),
           is_closed_(false),
-          message_mode_(false) {} // Added message_mode_ flag initialization
+          message_mode_(false) {}
 
     void write(RPCLIB_MSGPACK::sbuffer &&data);
-    
     SocketType &socket();
-
-    // ADD: Expose the underlying socket/stream_handle for external read
     SocketType &stream() { return socket_; }
-    
     RPCLIB_ASIO::strand &write_strand();
-    
     void close();
-    
     bool is_closed() const;
-    
-    // Add setter for message mode
-    void set_message_mode(bool enabled) {
-        message_mode_ = enabled;
-    }
-    
-    // Add getter for message mode
-    bool get_message_mode() const {
-        return message_mode_;
+    void set_message_mode(bool enabled) { message_mode_ = enabled; }
+    bool get_message_mode() const { return message_mode_; }
+
+    // Static helper: read one framed message ([4 bytes length][data]), returns buffer with message
+    // Usage: auto buf = async_writer<...>::read_framed(socket);
+    static std::vector<uint8_t> read_framed(SocketType &sock) {
+        uint32_t len = 0;
+        // Read 4 bytes length prefix (blocking, can be replaced with async if needed)
+        RPCLIB_ASIO::read(sock, RPCLIB_ASIO::buffer(&len, 4));
+        if (len == 0) return {};
+        std::vector<uint8_t> data(len);
+        RPCLIB_ASIO::read(sock, RPCLIB_ASIO::buffer(data.data(), len));
+        return data;
     }
 
 protected:
@@ -130,7 +138,7 @@ private:
     std::deque<RPCLIB_MSGPACK::sbuffer> write_queue_;
     std::atomic_bool exit_;
     std::atomic_bool is_closed_;
-    bool message_mode_; // Flag to indicate if using message mode
+    bool message_mode_;
 };
 
 // Specialized as original type for backward compatibility
@@ -139,6 +147,16 @@ using async_writer_tcp = async_writer<RPCLIB_ASIO::ip::tcp::socket>;
 // Template implementation part
 template <typename SocketType>
 void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
+    std::cout << "[async_writer] write() called, message_mode_=" << message_mode_ << ", closed=" << is_closed_ << std::endl;
+#ifdef _WIN32
+    // Windows Named Pipe: only allow synchronous write, do not use strand, do not use async
+    if (std::is_same<SocketType, RPCLIB_ASIO::windows::stream_handle>::value && message_mode_) {
+        // Directly write with framing, do not queue
+        write_helper(socket_, data, message_mode_);
+        return;
+    }
+#endif
+    // Original async queue logic for TCP/Unix
     write_queue_.push_back(std::move(data));
     if (!is_writing_ && !is_closed_) {
         is_writing_ = true;
@@ -148,31 +166,37 @@ void async_writer<SocketType>::write(RPCLIB_MSGPACK::sbuffer &&data) {
                 return;
             }
             auto &item = write_queue_.front();
-            
-#ifdef _WIN32
-            // Check if this is a Windows named pipe with message mode
-            if (std::is_same<SocketType, RPCLIB_ASIO::windows::stream_handle>::value && message_mode_) {
-                // Use specialized helper for Windows Named Pipes (framing included)
-                write_helper(socket_, item, message_mode_);
-                
-                // Handle completion directly for message mode
-                write_queue_.pop_front();
-                is_writing_ = false;
-                
-                // Process next item in queue if any
-                if (!write_queue_.empty() && !exit_) {
-                    write(std::move(RPCLIB_MSGPACK::sbuffer())); // Dummy to trigger processing
+
+            // For message_mode TCP/Unix, do framing here (not for Windows Pipe)
+            if (message_mode_) {
+                uint32_t len = static_cast<uint32_t>(item.size());
+                std::vector<char> framed(4 + item.size());
+                memcpy(framed.data(), &len, 4);
+                memcpy(framed.data() + 4, item.data(), item.size());
+
+                // --- Log framing header and part of content ---
+                std::cout << "[async_writer] [framing write] Length prefix: " << len << ", total bytes: " << framed.size() << std::endl;
+                std::cout << "[async_writer] [framing write] First 16 bytes (hex): ";
+                for (size_t i = 0; i < std::min(size_t(16), framed.size()); ++i) {
+                    printf("%02x ", (unsigned char)framed[i]);
                 }
-                return;
-            }
-#endif
-            // Standard async write for non-Windows or non-message mode
-            socket_.async_write_some(
-                RPCLIB_ASIO::buffer(item.data(), item.size()),
-                write_strand_.wrap(
-                    [this, self](std::error_code ec, std::size_t transferred) {
+                std::cout << std::endl;
+
+                RPCLIB_ASIO::async_write(
+                    socket_, RPCLIB_ASIO::buffer(framed.data(), framed.size()),
+                    write_strand_.wrap([this, self](std::error_code ec, std::size_t transferred) {
                         write_handler(ec, transferred);
-                    }));
+                    })
+                );
+            } else {
+                // Standard async write for non-message mode
+                socket_.async_write_some(
+                    RPCLIB_ASIO::buffer(item.data(), item.size()),
+                    write_strand_.wrap(
+                        [this, self](std::error_code ec, std::size_t transferred) {
+                            write_handler(ec, transferred);
+                        }));
+            }
         });
     }
 }
@@ -182,7 +206,7 @@ void async_writer<SocketType>::write_handler(std::error_code ec, std::size_t tra
     if (exit_) {
         return;
     }
-    
+
     if (!ec) {
         if (transferred < write_queue_.front().size()) {
             // sbuffer has no consume method, we need to create a new buffer
@@ -190,7 +214,7 @@ void async_writer<SocketType>::write_handler(std::error_code ec, std::size_t tra
             const size_t remaining = write_queue_.front().size() - transferred;
             new_buf.write(write_queue_.front().data() + transferred, remaining);
             write_queue_.front() = std::move(new_buf);
-            
+
             if (exit_) {
                 return;
             }
@@ -245,7 +269,7 @@ void async_writer<SocketType>::close() {
     exit_ = true;
     is_closed_ = true;
     std::error_code ec;
-    
+
     // Use specialized socket_traits to handle different socket types
     socket_traits<SocketType>::close_socket(socket_, ec);
 }

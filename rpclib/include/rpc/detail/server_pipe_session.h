@@ -24,29 +24,29 @@ class this_server_t;
 
 namespace detail {
 
-// Session class specialized for Named Pipes
+// Session class specialized for Named Pipes or sockets
 template<typename SocketType>
 class server_pipe_session : public async_writer<SocketType> {
 public:
     server_pipe_session(server *srv, RPCLIB_ASIO::io_service *io,
                    SocketType socket,
                    std::shared_ptr<dispatcher> disp, bool suppress_exceptions);
+
     void start();
     void close();
-    
-    // Set message mode flag for Windows Named Pipes
+
+    // Set message mode flag for Windows Named Pipes and propagate to async_writer
     void set_message_mode(bool enabled) {
         message_mode_ = enabled;
+        async_writer<SocketType>::set_message_mode(enabled); // propagate to base
     }
 
 private:
     void do_read();
     void setup_read_buf();
     void process_message(RPCLIB_MSGPACK::object_handle& msg_obj);
-    
-    // Special handling for Windows Named Pipes in message mode
-    void do_read_message_mode();
     void process_raw_message(const char* data, size_t size);
+    void do_read_message_mode();
 
 private:
     friend class rpc::this_handler_t;
@@ -69,5 +69,5 @@ private:
 } /* rpc */
 
 // Template implementation
-#include "server_pipe_session.inl"
+#include "rpc/detail/server_pipe_session.inl"
 #endif /* end of include guard: SERVER_PIPE_SESSION_H */
